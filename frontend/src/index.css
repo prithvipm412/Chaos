@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+:root {
+  --navy-950: #0a1628;
+  --navy-900: #0f1f3d;
+  --navy-800: #172b54;
+  --accent: #4f8cff;
+  --text: #e6edf7;
+  font-family: Inter, system-ui, sans-serif;
+  background: var(--navy-950);
+  color: var(--text);
+}
+
+@theme inline {
+  --color-navy-950: var(--navy-950);
+  --color-navy-900: var(--navy-900);
+  --color-navy-800: var(--navy-800);
+  --color-accent: var(--accent);
+  --color-text: var(--text);
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.boilerplate-card {
+  animation: fade-in 450ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boilerplate-card { animation: none; }
+}
