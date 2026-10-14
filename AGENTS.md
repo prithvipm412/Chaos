@@ -31,3 +31,8 @@ Write `BLOCKED: <reason>` under the card, commit whatever works, move to the nex
 - Every network/API call has a timeout and a handled error path. Bad input never crashes or hangs the app.
 - Secrets only in `.env` (never committed).
 - UI: navy palette from the theme file, smooth but subtle transitions, clear loading/error/empty states.
+
+## Git sync and safety
+- After every commit: `git pull --rebase` then `git push`.
+- If the rebase conflicts in HANDOFF.md or TASKS.md, keep BOTH sides' lines, `git add` the file, then `git rebase --continue`.
+- Never run `git push --force`, `git reset --hard`, `git clean`, or `rm -rf`, and never touch files outside this repo.
