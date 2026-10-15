@@ -76,7 +76,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Depends on: T04 (mock data)
   Done when: the mock done job shows 16 tiles in 6 groups, and the headline reads correctly.
 
-- [ ] T07 [CORE] Gene calling + BLAST wrappers (port from the spike)
+- [x] T07 [CORE] Gene calling + BLAST wrappers (port from the spike)
   Files: backend/genes.py, backend/blast.py, backend/tests/test_blast_parse.py
   Do: Move the working logic from backend/pipeline_spike.py (leave the spike file as is).
   `call_genes(contigs) -> list[dict]` with {orf_id, contig, start, end, strand, protein}, using pyrodigal meta mode

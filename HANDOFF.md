@@ -32,3 +32,4 @@
 
 T01 done: persistent atomic JSON job API, one daemon queue worker, fake four-step result, sample list and CORS; TestClient roundtrip passes in 8.38s (1 test).
 T05 done: FASTA validation, DNA/protein detection, N50/GC/N-content and quality guards; 9 QC tests pass. Invalid DNA characters below the protein threshold receive NOT_FASTA.
+T07 done: meta-mode gene caller + bounded BLAST wrapper and outfmt parser; 2 tests pass, real K-12 check 4,319 ORFs / 230 alignments in 16.30s with 6 BLAST threads.
