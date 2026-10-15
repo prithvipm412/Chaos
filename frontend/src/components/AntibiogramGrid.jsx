@@ -14,7 +14,7 @@ const STATUS_CONFIG = {
     accentDot: 'bg-uncertain',
   },
   NO_KNOWN: {
-    label: 'No known resistance found',
+    label: 'No known',
     badgeClass: 'bg-white border-noknown-border text-noknown shadow-2xs font-semibold',
     cardClass: 'border-noknown-border bg-noknown-bg/60 hover:bg-noknown-bg hover:border-emerald-400 shadow-2xs',
     accentDot: 'bg-noknown',
@@ -67,15 +67,15 @@ export default function AntibiogramGrid({ calls = [], disclaimer = DEFAULT_DISCL
                   >
                     <div className="space-y-2.5">
                       {/* Card Header: Name & Status Badge */}
-                      <div className="flex items-start justify-between gap-2">
-                        <h4 className="font-bold text-text text-base group-hover:text-black transition-colors">
+                      <div className="flex flex-wrap items-start justify-between gap-2">
+                        <h4 className="min-w-0 break-words font-bold text-text text-base group-hover:text-black transition-colors">
                           {call.antibiotic}
                         </h4>
                         <span
-                          className={`text-[11px] px-2 py-0.5 rounded-full border shrink-0 flex items-center gap-1.5 ${config.badgeClass}`}
+                          className={`text-[11px] px-2 py-0.5 rounded-full border max-w-full min-w-0 flex items-center gap-1.5 ${config.badgeClass}`}
                         >
-                          <span className={`w-1.5 h-1.5 rounded-full ${config.accentDot}`} />
-                          <span>{config.label}</span>
+                          <span className={`w-1.5 h-1.5 shrink-0 rounded-full ${config.accentDot}`} />
+                          <span className="min-w-0 break-words">{config.label}</span>
                         </span>
                       </div>
 

@@ -103,7 +103,7 @@ export default function JobScreen({ jobId }) {
           {/* Results section */}
           {job?.status === 'done' && job?.result && (
             <div id="results-container" className="space-y-8">
-              <SummaryBar summary={job.result.summary} />
+              <SummaryBar summary={job.result.summary} calls={job.result.calls || []} />
 
               {/* Genome QC Panel */}
               <QcPanel qc={job.result.qc} genesCalled={job.result.genes_called} />

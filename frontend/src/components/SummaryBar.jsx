@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function SummaryBar({ summary }) {
+export default function SummaryBar({ summary, calls = [] }) {
   if (!summary) return null;
 
   const { fail = 0, uncertain = 0, no_known = 0, headline = '', options = [] } = summary;
@@ -43,7 +43,10 @@ export default function SummaryBar({ summary }) {
                 key={opt}
                 className="px-2.5 py-0.5 rounded-md bg-noknown-bg border border-noknown-border text-noknown font-mono text-[11px] font-medium"
               >
-                {opt}
+                <span className="block">{opt}</span>
+                {calls.find((call) => call.antibiotic === opt)?.tags?.includes('urinary_tract_only') && (
+                  <span className="block text-[10px] font-sans">UTI only</span>
+                )}
               </span>
             ))}
           </div>
