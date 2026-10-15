@@ -25,7 +25,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Colistin and Tigecycline are UNCERTAIN (not NO_KNOWN) and none of the three appear in `summary.options`. Full
   suite passes, then `backend/.venv/bin/python scripts/precompute.py` to refresh caches (bump RULES_VERSION first).
 
-- [ ] F5 [CORE] Tag urinary-only antibiotics; don't let them rank first
+- [x] F5 [CORE] Tag urinary-only antibiotics; don't let them rank first
   Files: backend/rules.py, backend/predict.py, backend/tests/test_predict.py, backend/jobs.py
   Note: jobs.py added for required cache invalidation so cached calls include tags and updated ordering. PLAN.md already includes calls[].tags.
   Do: Bug (user testing) — Nitrofurantoin and Fosfomycin only treat urinary infections, but the narrowest-spectrum
