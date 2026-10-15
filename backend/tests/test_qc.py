@@ -51,7 +51,9 @@ def test_gzip_expansion_cap(monkeypatch):
     assert error.value.code=='TOO_LARGE'
 
 
-def test_upload_errors():
+def test_upload_errors(tmp_path, monkeypatch):
+    from backend import jobs
+    monkeypatch.setattr(jobs, 'JOBS_DIR', tmp_path)
     from fastapi.testclient import TestClient
     from backend.main import app
     from backend.config import MAX_UPLOAD_BYTES

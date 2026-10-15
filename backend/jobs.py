@@ -33,6 +33,35 @@ def get_job(job_id):
             return None
 
 
+def startup():
+    """Interrupted jobs are retryable; never silently restart an analysis after a crash."""
+    if not JOBS_DIR.exists():
+        return
+    for path in JOBS_DIR.glob('*/job.json'):
+        job = get_job(path.parent.name)
+        if job and job.get('status') in ('queued', 'running'):
+            job.update(status='failed', result=None, error=dict(code='INTERRUPTED', message='Server restarted during analysis', retryable=True))
+            for step in job.get('steps', []):
+                if step['status'] == 'running':
+                    step['status'] = 'failed'
+            save_job(job)
+
+
+def retry_job(job_id):
+    with _LOCK:
+        job = get_job(job_id)
+        if job is None:
+            return None
+        if job['status'] != 'failed':
+            raise ValueError('NOT_RETRYABLE')
+        job.update(status='queued', progress=0.0, error=None, result=None, cached=False, simulate=None)
+        for step in job['steps']:
+            step.update(status='pending', elapsed_s=0.0, detail='')
+        save_job(job)
+        _QUEUE.put(job_id)
+        return job_id
+
+
 def create_job(fasta_bytes: bytes | None, sample_id: str | None, label: str, simulate: str | None) -> str:
     job_id = 'j_' + secrets.token_hex(3)
     directory = JOBS_DIR / job_id
@@ -96,7 +125,13 @@ def execute_pipeline(data, update=None, simulate=None):
     except Exception as exc:
         from backend.blast import BlastError
         raise BlastError('GENE_CALLING_FAILED', 'Gene calling failed. Please check the genome and retry.') from exc
-    alignments = step(2, lambda: run_blastp(orfs, BLAST_DB, BLAST_TIMEOUT_S, BLAST_THREADS), lambda value: f'{len(value):,} alignments')
+    def blast_action():
+        if simulate == 'blast_timeout':
+            from backend.blast import BlastError
+            time.sleep(3)
+            raise BlastError('BLAST_TIMEOUT', f'Resistance search timed out after {BLAST_TIMEOUT_S} s')
+        return run_blastp(orfs, BLAST_DB, BLAST_TIMEOUT_S, BLAST_THREADS)
+    alignments = step(2, blast_action, lambda value: f'{len(value):,} alignments')
     hits = annotate_hits(alignments, orfs)
     prediction = step(3, lambda: predict(hits, qc), lambda value: f"{len(value['calls'])} antibiotics")
     selected = {name for name, seq in sorted(contigs, key=lambda c: len(c[1]), reverse=True)[:30]}

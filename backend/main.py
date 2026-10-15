@@ -1,14 +1,22 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, File, Form, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from backend.config import MAX_UPLOAD_BYTES
 
-from backend.jobs import create_job, get_job
+from backend.jobs import create_job, get_job, retry_job, startup
 from backend.samples import available_samples
 from backend.qc import InputError, parse_and_qc
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app):
+    startup()
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=['http://localhost:5173', 'http://127.0.0.1:5173'],
                    allow_credentials=False, allow_methods=['GET', 'POST'], allow_headers=['*'])
 
@@ -66,3 +74,14 @@ def job_status(job_id: str):
 @app.exception_handler(RequestValidationError)
 async def invalid_request(request, exc):
     return error_response('NO_INPUT', 'The request contains an invalid file or form field.', 'Choose a FASTA file or a sample.')
+
+
+@app.post('/api/jobs/{job_id}/retry', status_code=202)
+def retry(job_id: str):
+    try:
+        result = retry_job(job_id)
+    except ValueError:
+        return error_response('NOT_RETRYABLE', 'Only a failed analysis can be retried.', status=409)
+    if result is None:
+        return error_response('JOB_NOT_FOUND', 'This analysis no longer exists.', 'Start a new analysis.', 404)
+    return {'job_id': result, 'status': 'queued'}

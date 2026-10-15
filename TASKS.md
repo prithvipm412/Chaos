@@ -200,7 +200,8 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Done when: mock "protein" upload shows the PROTEIN_FASTA panel; a mock "fail" sample shows Retry.
 
 - [ ] T20 [CORE] Failure handling: retry, interruption, simulated BLAST timeout
-  Files: backend/jobs.py, backend/main.py
+  Files: backend/jobs.py, backend/main.py, backend/tests/test_api_skeleton.py, backend/tests/test_qc.py
+  Note: Test files added for reproducible recovery checks and isolated job stores during TestClient startup.
   Do: POST /api/jobs/{id}/retry: a failed job resets its steps to pending, clears the error, sets simulate=None, and is requeued (otherwise 409 NOT_RETRYABLE).
   On startup, every job.json with status queued/running → failed INTERRUPTED "Server restarted during analysis" retryable.
   simulate="blast_timeout" → after QC+genes, the blast step fails with BLAST_TIMEOUT (sleep 3 s first so it looks real).
