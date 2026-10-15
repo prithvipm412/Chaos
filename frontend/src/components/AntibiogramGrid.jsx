@@ -3,19 +3,19 @@ import React from 'react';
 const STATUS_CONFIG = {
   FAIL: {
     label: 'Likely to fail',
-    badgeClass: 'bg-white border-fail-border text-fail shadow-2xs font-semibold',
+    badgeClass: 'bg-bg-surface-elevated border-fail-border text-fail shadow-2xs font-semibold',
     cardClass: 'border-fail-border bg-fail-bg/60 hover:bg-fail-bg hover:border-red-400 shadow-2xs',
     accentDot: 'bg-fail',
   },
   UNCERTAIN: {
     label: 'Uncertain',
-    badgeClass: 'bg-white border-uncertain-border text-uncertain shadow-2xs font-semibold',
+    badgeClass: 'bg-bg-surface-elevated border-uncertain-border text-uncertain shadow-2xs font-semibold',
     cardClass: 'border-uncertain-border bg-uncertain-bg/60 hover:bg-uncertain-bg hover:border-amber-400 shadow-2xs',
     accentDot: 'bg-uncertain',
   },
   NO_KNOWN: {
     label: 'No known',
-    badgeClass: 'bg-white border-noknown-border text-noknown shadow-2xs font-semibold',
+    badgeClass: 'bg-bg-surface-elevated border-noknown-border text-noknown shadow-2xs font-semibold',
     cardClass: 'border-noknown-border bg-noknown-bg/60 hover:bg-noknown-bg hover:border-emerald-400 shadow-2xs',
     accentDot: 'bg-noknown',
   },
@@ -24,7 +24,52 @@ const STATUS_CONFIG = {
 const DEFAULT_DISCLAIMER =
   'Decision support only — confirm with lab AST. Absence of known genes does not prove susceptibility.';
 
-export default function AntibiogramGrid({ calls = [], disclaimer = DEFAULT_DISCLAIMER, onSelect }) {
+const SKELETON_GROUPS = [
+  { name: 'Penicillins', count: 3 },
+  { name: 'Cephalosporins', count: 3 },
+  { name: 'Carbapenems', count: 2 },
+  { name: 'Fluoroquinolones', count: 1 },
+  { name: 'Aminoglycosides', count: 2 },
+  { name: 'Other', count: 5 },
+];
+
+export default function AntibiogramGrid({ calls = [], disclaimer = DEFAULT_DISCLAIMER, onSelect, loading = false }) {
+  if (loading) {
+    return (
+      <section className="space-y-8" aria-busy="true" aria-label="Loading antibiotic predictions">
+        <div className="space-y-8">
+          {SKELETON_GROUPS.map((group) => (
+            <div key={group.name} className="space-y-3">
+              <div className="flex items-center gap-2 px-1">
+                <div className="h-4 w-36 bg-border rounded animate-pulse" />
+                <div className="flex-1 h-px bg-border" />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {Array.from({ length: group.count }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="rounded-xl border border-border bg-bg-surface-elevated p-4 shadow-2xs space-y-3 animate-pulse"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="h-5 w-24 bg-border rounded-md" />
+                      <div className="h-4 w-16 bg-bg-surface rounded-full" />
+                    </div>
+                    <div className="h-3 w-3/4 bg-bg-surface rounded" />
+                    <div className="pt-2 border-t border-border/60 flex items-center justify-between">
+                      <div className="h-3 w-12 bg-bg-surface rounded" />
+                      <div className="h-3 w-16 bg-bg-surface rounded" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
   // Group calls by group, preserving order of appearance
   const grouped = calls.reduce((acc, call) => {
     const groupName = call.group || 'Other';
@@ -36,6 +81,7 @@ export default function AntibiogramGrid({ calls = [], disclaimer = DEFAULT_DISCL
   }, {});
 
   const groupNames = Object.keys(grouped);
+  let globalTileIndex = 0;
 
   return (
     <section className="space-y-8" aria-label="Antibiogram prediction grid">
@@ -50,6 +96,7 @@ export default function AntibiogramGrid({ calls = [], disclaimer = DEFAULT_DISCL
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {grouped[groupName].map((call) => {
                 const config = STATUS_CONFIG[call.status] || STATUS_CONFIG.UNCERTAIN;
+                const tileIndex = globalTileIndex++;
 
                 return (
                   <article
@@ -62,7 +109,8 @@ export default function AntibiogramGrid({ calls = [], disclaimer = DEFAULT_DISCL
                         onSelect(call);
                       }
                     }}
-                    className={`group relative rounded-xl border p-4 transition-all duration-200 cursor-pointer flex flex-col justify-between ${config.cardClass}`}
+                    style={{ animationDelay: `${tileIndex * 40}ms` }}
+                    className={`group relative rounded-xl border p-4 transition-all duration-200 cursor-pointer flex flex-col justify-between animate-tile-in ${config.cardClass}`}
                     aria-label={`${call.antibiotic}: ${config.label}`}
                   >
                     <div className="space-y-2.5">

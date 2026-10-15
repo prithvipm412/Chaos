@@ -131,6 +131,11 @@ function JobScreenContent({ jobId, onRetry }) {
             />
           )}
 
+          {/* Skeleton grid while running */}
+          {(job?.status === 'running' || job?.status === 'queued') && (
+            <AntibiogramGrid loading={true} />
+          )}
+
           {/* Results section */}
           {job?.status === 'done' && job?.result && (
             <div id="results-container" className="space-y-8">

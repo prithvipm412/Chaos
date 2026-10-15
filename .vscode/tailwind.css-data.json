@@ -1,0 +1,6 @@
+{
+  "version": 1.1,
+  "atDirectives": [
+    { "name": "@theme", "description": "Tailwind CSS v4 theme variables; inline resolves references at the utility usage site." }
+  ]
+}

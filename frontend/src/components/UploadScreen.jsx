@@ -340,7 +340,7 @@ export default function UploadScreen() {
                     handleSelectSample(sample);
                   }
                 }}
-                className="group relative rounded-xl border border-border bg-white p-5 hover:border-accent hover:shadow-sm transition-all cursor-pointer flex flex-col justify-between"
+                className="group relative rounded-xl border border-border bg-white p-5 hover-lift hover:border-accent transition-all cursor-pointer flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-start justify-between gap-2">

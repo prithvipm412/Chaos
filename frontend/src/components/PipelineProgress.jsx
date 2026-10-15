@@ -92,7 +92,7 @@ export default function PipelineProgress({ steps = DEFAULT_STEPS, progress = 0, 
               key={step.id || idx}
               className={`rounded-xl border p-4 transition-all duration-200 flex flex-col justify-between ${
                 isRunning
-                  ? 'border-accent bg-accent-subtle/30 shadow-2xs ring-1 ring-accent/30'
+                  ? 'border-accent bg-accent-subtle/30 shadow-2xs ring-1 ring-accent/30 animate-step-pulse'
                   : isDone
                   ? 'border-border bg-white shadow-2xs'
                   : isFailed
