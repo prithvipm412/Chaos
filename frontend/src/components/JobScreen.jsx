@@ -48,7 +48,7 @@ function JobScreenContent({ jobId, onRetry }) {
           action={
             <a
               href="#/"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent text-white font-medium text-sm hover:bg-blue-700 active:scale-98 transition-all shadow-xs"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent text-white font-medium text-sm hover:bg-accent-hover active:scale-98 transition-all shadow-xs"
             >
               Start new analysis
             </a>

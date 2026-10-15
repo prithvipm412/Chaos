@@ -309,7 +309,7 @@ export default function UploadScreen() {
             onClick={() => triggerUpload(selectedFile)}
             className={`px-6 py-2.5 rounded-xl font-medium text-sm transition-all shadow-2xs ${
               selectedFile && !submitting && !uploadError
-                ? 'bg-accent text-white hover:bg-blue-700 active:scale-98 cursor-pointer'
+                ? 'bg-accent text-white hover:bg-accent-hover active:scale-98 cursor-pointer'
                 : 'bg-gray-100 text-gray-400 border border-border cursor-not-allowed'
             }`}
           >

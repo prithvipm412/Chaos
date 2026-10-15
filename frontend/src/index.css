@@ -10,7 +10,11 @@
   --text: #111827;
   --text-secondary: #6b7280;
   --accent: #2563eb;
+  --accent-hover: #1d4ed8;
   --accent-subtle: #eff6ff;
+  --header-from: #1e3a8a;
+  --header-to: #2563eb;
+  --header-subtitle: #dbeafe;
 
   /* Accessible Status Colors */
   --fail: #dc2626;
@@ -51,6 +55,7 @@
   --color-text: var(--text);
   --color-text-secondary: var(--text-secondary);
   --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
   --color-accent-subtle: var(--accent-subtle);
 
   /* Status Colors */
