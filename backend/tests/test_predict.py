@@ -94,3 +94,23 @@ def test_origin_contract_and_real_k12():
     assert result['summary']['fail']==0
     assert all(h['origin'] in ('acquired','intrinsic','unclassified') for h in hits)
     assert all(not h['used_for_calls'] for h in hits if h['origin']=='intrinsic')
+
+
+def test_remaining_options_rank_and_note():
+    from backend.rules import PANEL, SPECTRUM_RANK
+
+    # K-12-shaped input: normal intrinsic homologs must not remove options.
+    result = predict([hit('ampC'), hit('acrB', mechanism='antibiotic efflux')], {'grade': 'good'})
+    summary = result['summary']
+    assert set(SPECTRUM_RANK) == {drug['antibiotic'] for drug in PANEL}
+    assert summary['options'] == sorted(SPECTRUM_RANK, key=SPECTRUM_RANK.__getitem__)
+    assert summary['options'][0] == 'Nitrofurantoin'
+    assert summary['options_note'] == (
+        'Narrowest-spectrum options with no known resistance found, listed first-line to last-resort. '
+        'Decision support only — confirm with lab AST.'
+    )
+    resistant = predict([hit('KPC-3')], {'grade': 'good'})
+    assert set(resistant['summary']['options']) == {
+        call['antibiotic'] for call in resistant['calls'] if call['status'] == 'NO_KNOWN'
+    }
+    assert predict([], {'grade': 'poor'})['summary']['options'] == []

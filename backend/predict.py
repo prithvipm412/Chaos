@@ -1,6 +1,6 @@
 """Conservative marker rules: homolog presence alone never proves susceptibility."""
 import re
-from backend.rules import PANEL, classify
+from backend.rules import PANEL, SPECTRUM_RANK, classify
 
 DISCLAIMER = 'Decision support only — confirm with lab AST. Absence of known genes does not prove susceptibility.'
 
@@ -74,5 +74,6 @@ def predict(hits: list[dict], qc: dict) -> dict:
             break
     summary = dict(fail=sum(c['status'] == 'FAIL' for c in calls), uncertain=sum(c['status'] == 'UNCERTAIN' for c in calls),
                    no_known=sum(c['status'] == 'NO_KNOWN' for c in calls), headline=headline,
-                   options=[c['antibiotic'] for c in calls if c['status'] == 'NO_KNOWN'])
+                   options=sorted([c['antibiotic'] for c in calls if c['status'] == 'NO_KNOWN'], key=SPECTRUM_RANK.__getitem__),
+                   options_note='Narrowest-spectrum options with no known resistance found, listed first-line to last-resort. Decision support only — confirm with lab AST.')
     return dict(calls=calls, summary=summary, disclaimer=DISCLAIMER)

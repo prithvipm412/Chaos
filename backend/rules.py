@@ -12,6 +12,13 @@ PANEL = [dict(antibiotic=name, group=group, classes=classes) for name, group, cl
     ('Nitrofurantoin', 'Other', ['nitrofuran']), ('Fosfomycin', 'Other', ['fosfomycin']),
     ('Colistin', 'Other', ['polymyxin', 'peptide']), ('Tigecycline', 'Other', ['glycylcycline', 'tetracycline'])]]
 
+SPECTRUM_RANK = {name: rank for rank, name in enumerate([
+    'Nitrofurantoin', 'Fosfomycin', 'Ampicillin', 'Co-trimoxazole',
+    'Amoxicillin-clavulanate', 'Gentamicin', 'Ciprofloxacin', 'Amikacin',
+    'Piperacillin-tazobactam', 'Ceftriaxone', 'Ceftazidime', 'Cefepime',
+    'Tigecycline', 'Meropenem', 'Imipenem', 'Colistin',
+])}
+
 import re
 
 BETA_LACTAMS = [d['antibiotic'] for d in PANEL if d['group'] in ('Penicillins', 'Cephalosporins', 'Carbapenems')]

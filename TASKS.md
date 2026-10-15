@@ -194,7 +194,8 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Done when: `backend/.venv/bin/python -m pytest backend/tests -q` passes (new test included).
 
 - [ ] T29 [CORE] "Remaining options" ranked narrowest-spectrum-first
-  Files: backend/rules.py, backend/predict.py, backend/tests/test_predict.py
+  Files: backend/rules.py, backend/predict.py, backend/tests/test_predict.py, backend/jobs.py
+  Note: Cache version bump required so cached API results expose the ranked options and options_note.
   Do: rules.py: add `SPECTRUM_RANK: dict[str,int]` over all 16 PANEL antibiotics, narrowest/first-line = 0, reserve/
   last-resort = highest. Suggested order: Nitrofurantoin, Fosfomycin, Ampicillin, Co-trimoxazole,
   Amoxicillin-clavulanate, Gentamicin, Ciprofloxacin, Amikacin, Piperacillin-tazobactam, Ceftriaxone, Ceftazidime,
