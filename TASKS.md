@@ -199,7 +199,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Depends on: T12 (mock "fail"/"protein" names work before that)
   Done when: mock "protein" upload shows the PROTEIN_FASTA panel; a mock "fail" sample shows Retry.
 
-- [ ] T20 [CORE] Failure handling: retry, interruption, simulated BLAST timeout
+- [x] T20 [CORE] Failure handling: retry, interruption, simulated BLAST timeout
   Files: backend/jobs.py, backend/main.py, backend/tests/test_api_skeleton.py, backend/tests/test_qc.py
   Note: Test files added for reproducible recovery checks and isolated job stores during TestClient startup.
   Do: POST /api/jobs/{id}/retry: a failed job resets its steps to pending, clears the error, sets simulate=None, and is requeued (otherwise 409 NOT_RETRYABLE).
