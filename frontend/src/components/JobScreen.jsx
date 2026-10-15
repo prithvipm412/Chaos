@@ -4,6 +4,7 @@ import PipelineProgress from './PipelineProgress';
 import SummaryBar from './SummaryBar';
 import AntibiogramGrid from './AntibiogramGrid';
 import EvidenceDrawer from './EvidenceDrawer';
+import QcPanel from './QcPanel';
 
 export default function JobScreen({ jobId }) {
   const { job, error, connectionLost } = useJobPolling(jobId);
@@ -119,6 +120,30 @@ export default function JobScreen({ jobId }) {
           {job?.status === 'done' && job?.result && (
             <div id="results-container" className="space-y-8">
               <SummaryBar summary={job.result.summary} />
+
+              {/* Genome QC Panel */}
+              <QcPanel qc={job.result.qc} genesCalled={job.result.genes_called} />
+
+              {/* Incomplete Genome Banner for Poor Grade */}
+              {job.result.qc?.grade === 'poor' && (
+                <div
+                  role="alert"
+                  className="p-4 rounded-xl bg-red-950/40 border border-red-500/50 text-red-200 text-sm flex items-start gap-3 shadow-lg"
+                >
+                  <svg className="w-5 h-5 text-red-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <div>
+                    <p className="font-semibold text-red-300">
+                      Incomplete genome — results are less certain; green calls were downgraded.
+                    </p>
+                    <p className="text-xs text-red-200/80 mt-0.5">
+                      The assembly does not meet minimum quality criteria (total length or N50). Negative resistance calls cannot be ruled out with confidence.
+                    </p>
+                  </div>
+                </div>
+              )}
+
               <AntibiogramGrid
                 calls={job.result.calls}
                 disclaimer={job.result.disclaimer}

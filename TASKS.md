@@ -120,7 +120,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Done when: TestClient test (extend test_api_skeleton.py, that is allowed) on eco_ctxm reaches done in < 180 s with a Ceftriaxone FAIL.
   Post total timings to HANDOFF.
 
-- [ ] T11 [UI] Genome QC panel
+- [x] T11 [UI] Genome QC panel
   Files: frontend/src/components/QcPanel.jsx, frontend/src/components/JobScreen.jsx
   Do: A compact card: total length (Mb), contigs, N50, longest contig, GC %, N %, genes called, and a grade badge
   (good teal / fair amber / poor red), with the warnings listed. When the grade is poor, add a banner over the grid: "Incomplete genome —
