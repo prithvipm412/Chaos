@@ -23,7 +23,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Done when: backend/tests/test_api_skeleton.py (create it; that is the 5th file and is allowed) uses TestClient: POST sample_id=kpn_kpc
   → 202, poll GET until status=done within 15 s, result.calls non-empty. `python -m pytest backend/tests -q` passes.
 
-- [ ] T02 [UI] API client + mock fixtures
+- [x] T02 [UI] API client + mock fixtures
   Files: frontend/src/api.js, frontend/src/mock/samples.json, frontend/src/mock/job_done.json, frontend/src/mock/job_failed.json
   Do: job_done.json = the full PLAN.md Job JSON, extended to all 16 antibiotics (9 FAIL, 2 UNCERTAIN, 5 NO_KNOWN), 4 hits
   (KPC-3 exact, TEM-1 exact, aac(6')-Ib-cr strict, acrB origin:intrinsic used_for_calls:false; every hit has `origin`) and 5 contigs. job_failed.json = failed at

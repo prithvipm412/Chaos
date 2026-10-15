@@ -1,0 +1,26 @@
+[
+  {
+    "id": "kpn_kpc",
+    "label": "K. pneumoniae (ICU blood culture)",
+    "organism": "Klebsiella pneumoniae",
+    "note": "carbapenemase expected"
+  },
+  {
+    "id": "eco_ctxm",
+    "label": "E. coli (ESBL)",
+    "organism": "Escherichia coli",
+    "note": "ESBL expected"
+  },
+  {
+    "id": "eco_k12",
+    "label": "E. coli K-12 MG1655",
+    "organism": "Escherichia coli",
+    "note": "reference genome"
+  },
+  {
+    "id": "kpn_kpc_partial",
+    "label": "K. pneumoniae — incomplete assembly (demo)",
+    "organism": "Klebsiella pneumoniae",
+    "note": "incomplete genome"
+  }
+]

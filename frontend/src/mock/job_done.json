@@ -1,0 +1,271 @@
+{
+  "job_id": "j_mock01",
+  "status": "done",
+  "created_at": "2026-10-15T14:02:11Z",
+  "label": "K. pneumoniae (ICU blood culture)",
+  "steps": [
+    {
+      "id": "qc",
+      "label": "Genome QC",
+      "status": "done",
+      "elapsed_s": 0.4,
+      "detail": "4 contigs, 5.77 Mb"
+    },
+    {
+      "id": "genes",
+      "label": "Gene calling",
+      "status": "done",
+      "elapsed_s": 9.8,
+      "detail": "5,123 genes"
+    },
+    {
+      "id": "blast",
+      "label": "Resistance gene search",
+      "status": "done",
+      "elapsed_s": 41.2,
+      "detail": "38 hits"
+    },
+    {
+      "id": "predict",
+      "label": "Antibiotic prediction",
+      "status": "done",
+      "elapsed_s": 0.1,
+      "detail": "16 antibiotics"
+    }
+  ],
+  "progress": 1.0,
+  "cached": false,
+  "error": null,
+  "result": {
+    "qc": {
+      "total_length": 5766615,
+      "n_contigs": 4,
+      "n50": 5394056,
+      "longest_contig": 5394056,
+      "gc_percent": 57.2,
+      "n_percent": 0.01,
+      "grade": "good",
+      "warnings": []
+    },
+    "genes_called": 5123,
+    "contigs": [
+      { "id": "CP008830.1", "length": 113105 },
+      { "id": "CP008831.1", "length": 5394056 },
+      { "id": "CP008832.1", "length": 145000 },
+      { "id": "CP008833.1", "length": 85000 },
+      { "id": "CP008834.1", "length": 29454 }
+    ],
+    "hits": [
+      {
+        "hit_id": "h1",
+        "gene": "KPC-3",
+        "aro": "ARO:3002312",
+        "family": "KPC beta-lactamase",
+        "drug_classes": ["carbapenem", "cephalosporin", "penam"],
+        "mechanism": "antibiotic inactivation",
+        "identity": 100.0,
+        "coverage": 100.0,
+        "tier": "exact",
+        "contig": "CP008830.1",
+        "start": 15984,
+        "end": 16865,
+        "strand": "+",
+        "origin": "acquired",
+        "used_for_calls": true,
+        "rule": "carbapenemase"
+      },
+      {
+        "hit_id": "h2",
+        "gene": "TEM-1",
+        "aro": "ARO:3000055",
+        "family": "TEM beta-lactamase",
+        "drug_classes": ["penam", "cephalosporin"],
+        "mechanism": "antibiotic inactivation",
+        "identity": 100.0,
+        "coverage": 100.0,
+        "tier": "exact",
+        "contig": "CP008830.1",
+        "start": 22010,
+        "end": 22871,
+        "strand": "-",
+        "origin": "acquired",
+        "used_for_calls": true,
+        "rule": "narrow_bla"
+      },
+      {
+        "hit_id": "h3",
+        "gene": "aac(6')-Ib-cr",
+        "aro": "ARO:3002538",
+        "family": "AAC(6') aminoglycoside acetyltransferase",
+        "drug_classes": ["aminoglycoside", "fluoroquinolone"],
+        "mechanism": "antibiotic inactivation",
+        "identity": 98.5,
+        "coverage": 95.0,
+        "tier": "strict",
+        "contig": "CP008830.1",
+        "start": 35120,
+        "end": 35719,
+        "strand": "+",
+        "origin": "acquired",
+        "used_for_calls": true,
+        "rule": "aac(6)-Ib"
+      },
+      {
+        "hit_id": "h4",
+        "gene": "acrB",
+        "aro": "ARO:3000508",
+        "family": "resistance-nodulation-cell division (RND) antibiotic efflux pump",
+        "drug_classes": ["aminoglycoside", "carbapenem", "cephalosporin", "fluoroquinolone", "macrolide", "penam", "tetracycline"],
+        "mechanism": "antibiotic efflux",
+        "identity": 99.8,
+        "coverage": 100.0,
+        "tier": "exact",
+        "contig": "CP008831.1",
+        "start": 450200,
+        "end": 453300,
+        "strand": "+",
+        "origin": "intrinsic",
+        "used_for_calls": false,
+        "rule": "intrinsic"
+      }
+    ],
+    "calls": [
+      {
+        "antibiotic": "Ampicillin",
+        "group": "Penicillins",
+        "status": "FAIL",
+        "confidence": "high",
+        "evidence": ["h1", "h2"],
+        "reason": "KPC-3 carbapenemase (100% id, 100% cov)"
+      },
+      {
+        "antibiotic": "Amoxicillin-clavulanate",
+        "group": "Penicillins",
+        "status": "FAIL",
+        "confidence": "high",
+        "evidence": ["h1"],
+        "reason": "KPC-3 carbapenemase (100% id, 100% cov)"
+      },
+      {
+        "antibiotic": "Piperacillin-tazobactam",
+        "group": "Penicillins",
+        "status": "FAIL",
+        "confidence": "high",
+        "evidence": ["h1"],
+        "reason": "KPC-3 carbapenemase (100% id, 100% cov)"
+      },
+      {
+        "antibiotic": "Ceftriaxone",
+        "group": "Cephalosporins",
+        "status": "FAIL",
+        "confidence": "high",
+        "evidence": ["h1"],
+        "reason": "KPC-3 carbapenemase (100% id, 100% cov)"
+      },
+      {
+        "antibiotic": "Ceftazidime",
+        "group": "Cephalosporins",
+        "status": "FAIL",
+        "confidence": "high",
+        "evidence": ["h1"],
+        "reason": "KPC-3 carbapenemase (100% id, 100% cov)"
+      },
+      {
+        "antibiotic": "Cefepime",
+        "group": "Cephalosporins",
+        "status": "FAIL",
+        "confidence": "high",
+        "evidence": ["h1"],
+        "reason": "KPC-3 carbapenemase (100% id, 100% cov)"
+      },
+      {
+        "antibiotic": "Meropenem",
+        "group": "Carbapenems",
+        "status": "FAIL",
+        "confidence": "high",
+        "evidence": ["h1"],
+        "reason": "KPC-3 carbapenemase (100% id, 100% cov)"
+      },
+      {
+        "antibiotic": "Imipenem",
+        "group": "Carbapenems",
+        "status": "FAIL",
+        "confidence": "high",
+        "evidence": ["h1"],
+        "reason": "KPC-3 carbapenemase (100% id, 100% cov)"
+      },
+      {
+        "antibiotic": "Amikacin",
+        "group": "Aminoglycosides",
+        "status": "FAIL",
+        "confidence": "medium",
+        "evidence": ["h3"],
+        "reason": "aac(6')-Ib-cr aminoglycoside acetyltransferase (98.5% id, 95% cov)"
+      },
+      {
+        "antibiotic": "Ciprofloxacin",
+        "group": "Fluoroquinolones",
+        "status": "UNCERTAIN",
+        "confidence": "medium",
+        "evidence": ["h3"],
+        "reason": "aac(6')-Ib-cr fluoroquinolone acetyltransferase; point mutations not assessed"
+      },
+      {
+        "antibiotic": "Fosfomycin",
+        "group": "Other",
+        "status": "UNCERTAIN",
+        "confidence": "low",
+        "evidence": [],
+        "reason": "Intrinsic or unclassified resistance pathway cannot be excluded"
+      },
+      {
+        "antibiotic": "Gentamicin",
+        "group": "Aminoglycosides",
+        "status": "NO_KNOWN",
+        "confidence": "high",
+        "evidence": [],
+        "reason": "No known aminoglycoside-modifying enzymes detected for gentamicin"
+      },
+      {
+        "antibiotic": "Co-trimoxazole",
+        "group": "Other",
+        "status": "NO_KNOWN",
+        "confidence": "high",
+        "evidence": [],
+        "reason": "No known sul or dfr resistance genes detected"
+      },
+      {
+        "antibiotic": "Nitrofurantoin",
+        "group": "Other",
+        "status": "NO_KNOWN",
+        "confidence": "medium",
+        "evidence": [],
+        "reason": "No known acquired resistance genes detected; point mutations not assessed"
+      },
+      {
+        "antibiotic": "Colistin",
+        "group": "Other",
+        "status": "NO_KNOWN",
+        "confidence": "high",
+        "evidence": [],
+        "reason": "No mcr family phosphoethanolamine transferases detected"
+      },
+      {
+        "antibiotic": "Tigecycline",
+        "group": "Other",
+        "status": "NO_KNOWN",
+        "confidence": "high",
+        "evidence": [],
+        "reason": "No tet(X) family tigecycline-inactivating enzymes detected"
+      }
+    ],
+    "summary": {
+      "fail": 9,
+      "uncertain": 2,
+      "no_known": 5,
+      "headline": "Carbapenem-resistant (KPC) — avoid carbapenems",
+      "options": ["Gentamicin", "Colistin", "Tigecycline", "Co-trimoxazole"]
+    },
+    "disclaimer": "Decision support only — confirm with lab AST. Absence of known genes does not prove susceptibility."
+  }
+}

@@ -37,3 +37,4 @@ T09 done: cached CARD index loader, full 16-drug panel and prediction v0 with QC
 T10 done: real QC→genes→BLAST→prediction worker, existing-file sample registry, synchronous upload validation and annotated evidence; all 14 tests pass, EC958 API pipeline 17.776s with Ceftriaxone FAIL. UI T12 can integrate now; v0 class rules remain temporary until T15.
 T13 done: acquired-marker RULES and intrinsic exclusions, 19 rule/panel checks pass; named oqxAB rule takes precedence over broad efflux mechanism so its specified effect is UNCERTAIN only.
 T15 done: best-per-ORF annotation, conservative rule effects, intrinsic marking, partial/allele caution, sul+dfr pairing, QC guard, evidence reasons and headlines; full backend suite 41 passed in 18.58s, including real EC958 API.
+T02 done: API client with timeout and mock fixtures for 16 antibiotics, 4 hits with origin, 5 contigs, and failed BLAST.
