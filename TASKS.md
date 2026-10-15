@@ -1,10 +1,24 @@
 # TASKS.md — written by the lead
-Executors: take the first unchecked card in your lane. [CORE] = Codex (~/chaos). [UI] = Antigravity (~/chaos-ui).
+Executors: take the first unchecked card in your lane. [CORE] = Codex (~/chaos). [UI] = Codex (~/chaos-ui), as of
+the 15:40 review. NOTHING NEW STARTS AFTER 16:15 (freeze 16:30) — if you pick up a card after 16:15, stop and leave
+it unstarted for the lead instead.
 Every card: read PLAN.md first, since the JSON shapes there are the contract. Touch only the listed files.
 CORE checks run from `~/chaos`. UI checks run from `~/chaos-ui`. UI build check = `npm --prefix frontend run build`.
 UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
 
 ## FIX — lead puts urgent fixes here (do these first)
+- [ ] F7 [UI] Warn when every remaining option is urinary-only
+  Files: frontend/src/components/SummaryBar.jsx
+  Do: User testing — the KPC sample's `options` is now just `["Nitrofurantoin"]` (correct per F4/F5, but a doctor
+  glancing at one green chip could miss that it's not usable for this infection). Pure client-side check, no
+  backend change: in the options block, if `options.length > 0` and every option's matching call has
+  `tags.includes('urinary_tract_only')`, show a clear line below the chips: "No systemic options with no known
+  resistance — consult microbiology / infectious diseases." (keep showing the chips themselves, this is additive).
+  The existing "None identified in tested panel" empty-state is unchanged.
+  Depends on: F5, F6 (reads the same `tags` field F6 already wired up)
+  Done when: `npm --prefix frontend run build` passes; the kpn_kpc real/cached result shows the new warning line
+  under the single Nitrofurantoin chip; a result with a non-urinary option (e.g. eco_k12) does not show it.
+
 - [x] F4 [CORE] Don't call NO_KNOWN for drugs that are usually mutation-resistant
   Files: backend/predict.py, backend/tests/test_predict.py, backend/jobs.py
   Note: jobs.py is for the required RULES_VERSION cache bump, same pattern as F3.

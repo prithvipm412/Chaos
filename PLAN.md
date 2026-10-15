@@ -120,6 +120,8 @@ frontend/src/api.js  frontend/src/mock/*.json  frontend/src/hooks/  frontend/src
    (they only treat UTIs). `options` (NO_KNOWN antibiotics) is sorted narrowest-spectrum-first by
    `rules.SPECTRUM_RANK` (first-line → reserve-of-last-resort) EXCEPT urinary-only drugs always sort after every
    non-restricted option — never ranked first for a serious systemic infection just for being narrow-spectrum.
+   UI: if every option is urinary-only, show "No systemic options with no known resistance — consult
+   microbiology / infectious diseases" alongside the chips (client-side check, no API field for this).
    `options_note` (fixed string above) frames this as decision support, not a recommendation.
 Panel (16, `group`): Penicillins: Ampicillin, Amoxicillin-clavulanate, Piperacillin-tazobactam ·
 Cephalosporins: Ceftriaxone, Ceftazidime, Cefepime · Carbapenems: Meropenem, Imipenem ·

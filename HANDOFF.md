@@ -1,13 +1,17 @@
 # HANDOFF.md — shared memory between agents. Append only, newest at bottom.
 
 ## Current state (lead rewrites this block at each review)
-- Milestone: CORE done through M2.5 (T01-T29 all checked, incl. T28/T29). UI at T11 done, T12 next. Freeze 16:30.
-- Works: full real pipeline (QC→genes→BLAST→predict) on all 3 real samples, cached, retry/interrupted recovery, input
-  hardening, demo fixtures, ranked "remaining options". UI shell + grid + QC panel against mocks.
-- Broken / risks: was broken, now fixed — EC958 headline named CMY-23 (AmpC) instead of CTX-M-15 (the real ESBL),
-  fixed in predict.py and pinned as a regression test in T28. DESIGN CHANGE at 14:00: dropping navy for a light
-  theme — see FIX F1/F2 at the top of TASKS.md and PLAN.md "Style". T21 and T27 retagged [UI]→[CORE] (see log) —
-  Codex now also has frontend cards; checks still run `npm --prefix frontend run build` from ~/chaos.
+- Milestone: review-2 @15:40. T01-T29 and F1-F6 ALL checked and done. 57 backend tests pass, frontend build passes.
+  Only F7 (just added) is open. Freeze 16:30 — nothing new starts after 16:15.
+- Works: full real pipeline on all 3+1 real samples (cache + precompute), QC guard, mutation-driven/urinary-only
+  policy, retry/interrupted recovery, input hardening, light theme, printable report, recent-analyses list,
+  evidence drawer, contig map, genes table. The person testing confirms all 4 samples, bad inputs and the
+  evidence drawer work. DEMO.md/DECLARED.md already have a solid draft (see log) — lead to polish at freeze, not
+  rewrite.
+- Broken / risks: none open besides F7. Watch the 16:15 cutoff; if F7 isn't done by then, ship without it (it's
+  additive UI only, nothing else depends on it).
+- Next: [UI] (now Codex, ~/chaos-ui) → F7. [CORE] (Codex, ~/chaos) → idle/available if anything breaks.
+  Lead's own remaining freeze outputs: finalize DEMO.md/DECLARED.md, tag review-2.
 - Next 3 cards: UI T12 (switch off mocks) → T14 → T17; CORE F1 (light theme tokens, do first) → F2 → T21 (clean, no file overlap)
   CORE spare-capacity T28 → T29 (M2.5, non-blocking)
 
@@ -153,3 +157,23 @@ T25 done: staggered tiles, active-step pulse, six-group loading skeleton and sam
 T27 done: recent analyses below samples lists up to five jobs with label, status, local time and job links; hidden on errors. Existing listJobs API and two mock rows reused; frontend build passes. Pre-existing package-lock.json edits preserved.
 
 T24 done: Print report action and print-only ReportHeader include sample/job/date/QC, 16 predictions, used genes and bold disclaimer; print CSS hides interactive UI and repeats table headers. Build and Chrome print-media checks pass on mock and real partial-genome results (roughly two A4 pages); no new dependencies.
+
+### Lead: review-2, 15:40 (freeze 16:30)
+- Verified clean: `git pull --rebase` clean (one unrelated unstaged frontend/package-lock.json diff left alone,
+  not mine to touch); `backend/.venv/bin/python -m pytest backend/tests -q` → 57 passed; `npm --prefix frontend
+  run build` → succeeds in 408ms. Zero unchecked cards in TASKS.md — T01-T29 and F1-F6 are all done, ahead of the
+  16:30 freeze by close to an hour.
+- Noted but not touched: a CORE commit ("Add demo launcher, declarations and presentation draft") already wrote
+  DEMO.md, DECLARED.md, scripts/run_demo.sh, scripts/stop_demo.sh ahead of freeze. Read it — it's a solid, accurate
+  draft (correct accession numbers, correct cache-hit caveat, correct failure/refresh demo steps). These are lead
+  deliverables per CLAUDE.md; will polish rather than rewrite when finalizing at freeze.
+- Added FIX F7 [UI] (SummaryBar.jsx only, 1 file): confirmed live that kpn_kpc's `options` is now exactly
+  `["Nitrofurantoin"]` after F4/F5 — correct, but a single green chip could read as "there's a safe option" when
+  it's actually unusable for a bloodstream infection. F7 adds a clear warning line when every remaining option is
+  urinary-only. Pure client-side logic (existing `options` + `calls[].tags`, no backend/API change) — PLAN.md
+  point 8 updated to note this is UI-only, not a new JSON field.
+- Lane note (user instruction): [UI] is now also run by Codex in ~/chaos-ui, not Antigravity — updated the
+  TASKS.md header. File-ownership rules and worktree/push mechanics are unchanged.
+- Hard stop: nothing new starts after 16:15. Added that line to the TASKS.md header directly, since it applies
+  to every remaining card, not just one.
+- `git tag review-2` after this commit.
