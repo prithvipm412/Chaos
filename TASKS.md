@@ -181,6 +181,30 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Depends on: T08
   Done when: the mock shows acrB in the "not used" section.
 
+## M2.5 — CORE spare capacity (added at 14:00 review; CORE finished M0-M2 early)
+- [ ] T28 [CORE] End-to-end upload API test, all 3 real samples
+  Files: backend/tests/test_e2e_samples.py
+  Do: TestClient test that POSTs each of kpn_kpc, eco_ctxm, eco_k12 via `sample_id` to /api/jobs (the T22 cache makes
+  this fast), polls GET /api/jobs/{id} to status done within 30 s, and asserts: kpn_kpc headline contains
+  "Carbapenem-resistant"; eco_ctxm headline is exactly "ESBL-producer (CTX-M-15)" (regression guard — it must never
+  say CMY-23); eco_k12 summary.fail == 0. Also assert every hit in every result has an `origin` key and every
+  NO_KNOWN call has a non-empty reason.
+  Depends on: T16, T22, the predict.py headline fix (commit after e47bab5)
+  Done when: `backend/.venv/bin/python -m pytest backend/tests -q` passes (new test included).
+
+- [ ] T29 [CORE] "Remaining options" ranked narrowest-spectrum-first
+  Files: backend/rules.py, backend/predict.py, backend/tests/test_predict.py
+  Do: rules.py: add `SPECTRUM_RANK: dict[str,int]` over all 16 PANEL antibiotics, narrowest/first-line = 0, reserve/
+  last-resort = highest. Suggested order: Nitrofurantoin, Fosfomycin, Ampicillin, Co-trimoxazole,
+  Amoxicillin-clavulanate, Gentamicin, Ciprofloxacin, Amikacin, Piperacillin-tazobactam, Ceftriaxone, Ceftazidime,
+  Cefepime, Tigecycline, Meropenem, Imipenem, Colistin. predict.py: sort `summary['options']` by SPECTRUM_RANK
+  ascending (was PANEL order) and add `summary['options_note']` = the fixed string in PLAN.md "summary". No other
+  field changes.
+  Interface: PLAN.md "summary" JSON + engineered-core point 7.
+  Depends on: T15
+  Done when: a test using the existing eco_k12-shaped NO_KNOWN fixture asserts `options[0]` is a narrow agent
+  (e.g. Nitrofurantoin or Ampicillin, never Colistin/Meropenem) and `options_note` is present and non-empty.
+
 ## M3 — Robustness + failure demos (target 16:10)
 - [x] T18 [CORE] Input hardening
   Files: backend/qc.py, backend/main.py, backend/tests/test_qc.py

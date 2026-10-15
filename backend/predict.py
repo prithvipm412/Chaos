@@ -62,11 +62,15 @@ def predict(hits: list[dict], qc: dict) -> dict:
         calls.append(dict(antibiotic=drug['antibiotic'], group=drug['group'], status=status, confidence=confidence,
                           evidence=[h['hit_id'] for h in evidence], reason=reason))
     headline = 'No major acquired resistance found'
-    for group, title in [('Carbapenems', 'Carbapenem-resistant'), ('Cephalosporins', 'ESBL-producer')]:
-        call = next((c for c in calls if c['group'] == group and c['status'] == 'FAIL'), None)
-        if call:
-            gene = next(h['gene'] for h in hits if h['hit_id'] == call['evidence'][0])
-            headline = f'{title} ({gene})'
+    # Priority by mechanism, not genome position: a plasmid AmpC must never outrank a true ESBL for the headline.
+    priority = [('carbapenemase', 'Carbapenem-resistant'), ('esbl', 'ESBL-producer'),
+                ('plasmid_ampc', 'AmpC-producer'), ('narrow_beta_lactamase', 'Beta-lactamase-producer')]
+    fail_ids = {h for c in calls if c['status'] == 'FAIL' for h in c['evidence']}
+    fail_hits = [h for h in hits if h['hit_id'] in fail_ids]
+    for rule_name, title in priority:
+        hit = next((h for h in fail_hits if h.get('rule') == rule_name), None)
+        if hit:
+            headline = f'{title} ({hit["gene"]})'
             break
     summary = dict(fail=sum(c['status'] == 'FAIL' for c in calls), uncertain=sum(c['status'] == 'UNCERTAIN' for c in calls),
                    no_known=sum(c['status'] == 'NO_KNOWN' for c in calls), headline=headline,

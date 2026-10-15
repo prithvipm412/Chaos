@@ -1,11 +1,34 @@
 # HANDOFF.md — shared memory between agents. Append only, newest at bottom.
 
 ## Current state (lead rewrites this block at each review)
-- Milestone: M0 (plan written 13:45; freeze 16:30)
-- Works: boilerplate; BLAST 2.17.0 installed via brew (lead); setup spike in progress (Codex)
-- Broken / risks: CORE lane has 13 cards in ~165 min, so it is the bottleneck. BLAST runtime unknown until the spike reports it.
-  K-12 intrinsic hits could make a naive engine overclaim (T13/T15/T16 handle this).
-- Next 3 cards: CORE T01 (after the spike) → T05 → T07; UI T02 → T03 → T04
+- Milestone: M2 complete on CORE (all 13 original cards done); UI mid-M1 (T02/T03/T04/T06 done, T08 in progress). Freeze 16:30.
+- Works: full real pipeline (QC→genes→BLAST→predict) on all 3 real samples, cached, retry/interrupted recovery, input
+  hardening, demo fixtures. UI shell + grid against mocks.
+- Broken / risks: was broken, now fixed — EC958 headline named CMY-23 (AmpC) instead of CTX-M-15 (the real ESBL)
+  because predict.py picked the first evidence hit by genome position, not by mechanism. Fixed directly (see log).
+  UI lane is now the pace-setter: T08/T11/T12/T14/T17/T19/T21 before M3 robustness UI, then M4 polish.
+- Next 3 cards: UI T08 (finish, in progress) → T11 → T12 (switch off mocks — CORE's real API is ready and sample ids match);
+  CORE spare-capacity T28 → T29 (M2.5, non-blocking)
+
+## Review notes — review-1, 2026-10-15 ~14:00
+- CORE finished T01,T05,T07,T09,T10,T13,T15,T16,T18,T20,T22,T23,T26 — all of M0-M3's CORE cards, early.
+- Bug found + fixed (lead, backend/predict.py, 9 lines): headline for a Cephalosporins FAIL picked
+  `call['evidence'][0]` — whichever hit's gene happened to sit first in the genome — instead of the hit that is
+  mechanistically an ESBL. EC958 carries both CMY-23 (plasmid AmpC) and CTX-M-15 (true ESBL); CMY-23's gene call
+  landed first, so the headline wrongly said "ESBL-producer (CMY-23)". Fix: headline now ranks by rule name
+  (carbapenemase > esbl > plasmid_ampc > narrow_beta_lactamase) across ALL fail-contributing hits, so CTX-M-15 wins
+  whenever it's present. Verified against the real saved validation output: headline is now exactly
+  "ESBL-producer (CTX-M-15)". Full suite: 50 passed. PLAN.md headline rule updated to match (added AmpC/narrow titles).
+- Added CORE spare-capacity cards (M2.5, after M2 in TASKS.md): T28 end-to-end API test over all 3 real samples
+  (also pins the headline fix as a regression guard), T29 "remaining options" sorted narrowest-spectrum-first with
+  an `options_note` disclaimer (chose this over fluoroquinolone point-mutation calling — that needs CARD's protein
+  variant model + reference SNP comparison, a bigger build than fits before 15:35, and the ranked-options panel
+  serves the locked user — "what do I actually give instead" — more directly). PLAN.md summary JSON + engineered-core
+  point 7 updated to match.
+- UI: T02/T03/T04/T06 done, sample ids in frontend/src/mock/samples.json match backend/samples.py exactly (kpn_kpc,
+  eco_ctxm, eco_k12, kpn_kpc_partial) — T12 has nothing blocking it. T08 was mid-card (EvidenceDrawer.jsx untracked,
+  JobScreen.jsx modified) at review time — not touched, per AGENTS.md leave-it-to-the-agent-that-started-it rule.
+- Risk watch for next review: UI lane (7 cards left before M4) is now the critical path, not CORE.
 
 ## Log
 

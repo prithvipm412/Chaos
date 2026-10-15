@@ -70,7 +70,8 @@ frontend/src/api.js  frontend/src/mock/*.json  frontend/src/hooks/  frontend/src
   "calls":[{"antibiotic":"Meropenem","group":"Carbapenems","status":"FAIL","confidence":"high",
             "evidence":["h1"],"reason":"KPC-3 carbapenemase (100% id, 100% cov)"}],
   "summary":{"fail":9,"uncertain":2,"no_known":5,"headline":"Carbapenem-resistant (KPC) — avoid carbapenems",
-             "options":["Amikacin","Colistin","Tigecycline"]},
+             "options":["Amikacin","Colistin","Tigecycline"],
+             "options_note":"Narrowest-spectrum options with no known resistance found, listed first-line to last-resort. Decision support only — confirm with lab AST."},
   "disclaimer":"Decision support only — confirm with lab AST. Absence of known genes does not prove susceptibility."}}
 ```
 - Job `status`: `queued|running|done|failed`. Step `status`: `pending|running|done|failed`. Step `detail` can be `""`.
@@ -103,8 +104,14 @@ frontend/src/api.js  frontend/src/mock/*.json  frontend/src/hooks/  frontend/src
    Confidence: FAIL high (exact) / medium (strict); NO_KNOWN medium (good QC) / low (fair).
 5. **QC guard**: grade poor → every NO_KNOWN becomes UNCERTAIN, reason "genome incomplete — cannot rule out".
    Ciprofloxacin, Nitrofurantoin NO_KNOWN reasons add "point mutations not assessed".
-6. Headline: carbapenem FAIL → "Carbapenem-resistant (<gene>)"; elif 3GC FAIL → "ESBL-producer (<gene>)";
-   else "No major acquired resistance found". `options` = NO_KNOWN antibiotics.
+6. Headline: by mechanism priority across ALL FAIL evidence, not genome position or group —
+   carbapenemase → "Carbapenem-resistant (<gene>)"; elif esbl → "ESBL-producer (<gene>)";
+   elif plasmid_ampc → "AmpC-producer (<gene>)"; elif narrow_beta_lactamase → "Beta-lactamase-producer (<gene>)";
+   else "No major acquired resistance found" (e.g. EC958 has both CMY-23 and CTX-M-15 FAIL Ceftriaxone —
+   headline must say ESBL-producer (CTX-M-15), never AmpC). `options` = NO_KNOWN antibiotics.
+7. `options` (NO_KNOWN antibiotics) is sorted narrowest-spectrum-first by `rules.SPECTRUM_RANK`
+   (first-line → reserve-of-last-resort), so a doctor sees the least broad safe choice first, never Colistin/Meropenem
+   first. `options_note` (fixed string above) frames this as decision support, not a recommendation.
 Panel (16, `group`): Penicillins: Ampicillin, Amoxicillin-clavulanate, Piperacillin-tazobactam ·
 Cephalosporins: Ceftriaxone, Ceftazidime, Cefepime · Carbapenems: Meropenem, Imipenem ·
 Fluoroquinolones: Ciprofloxacin · Aminoglycosides: Gentamicin, Amikacin · Other: Co-trimoxazole,
