@@ -228,6 +228,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
 
 - [ ] T23 [CORE] Demo inputs: partial genome + bad files
   Files: scripts/make_demo_inputs.sh, demo_inputs/README.md, backend/samples.py
+  Generated-file exception: commit demo_inputs/protein.fasta, empty.fasta, notes.txt, header_only.fasta, genome_small.fasta.gz, explicitly required below.
   Do: The script writes data/samples/kpn_kpc_partial.fasta: chop the kp_kpc chromosome (the longest contig) into 20 kb pieces and
   keep the first 60 (1.2 Mb), with no plasmids, so KPC-3 is gone. This is the "never a false safe" demo and small committed files in demo_inputs/: protein.fasta (3 CARD proteins), empty.fasta, notes.txt
   (plain text), header_only.fasta, genome_small.fasta.gz (gzip of 20 kb DNA). Register kpn_kpc_partial with
