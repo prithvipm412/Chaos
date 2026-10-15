@@ -95,7 +95,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Depends on: T06
   Done when: clicking Meropenem in mock mode shows the KPC-3 evidence card.
 
-- [ ] T09 [CORE] CARD index + panel + prediction v0
+- [x] T09 [CORE] CARD index + panel + prediction v0
   Files: backend/card.py, backend/rules.py, backend/predict.py, backend/tests/test_predict.py
   Do: card.py: `load_card_index(card_dir) -> dict[aro, {name, family, drug_classes: list[str], mechanism}]` from
   aro_index.tsv (split Drug Class on ';', lowercase it, and strip " antibiotic"). Cache it in a module global.
