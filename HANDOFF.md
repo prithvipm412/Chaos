@@ -144,3 +144,5 @@ T17 done: collapsible GenesTable with "Used for predictions" and "Intrinsic — 
 F4 done: Ciprofloxacin/Colistin/Tigecycline default to low-confidence UNCERTAIN when no gene evidence exists and leave options; acquired evidence and Nitrofurantoin handling retained. 56 tests pass; all four caches rebuilt with v1-mutation-5. Pre-existing frontend/package-lock.json metadata edits temporarily stashed for commit/sync isolation, to restore at session end.
 
 F5 done: calls carry urinary_tract_only tags for Nitrofurantoin/Fosfomycin (empty tags elsewhere), and urinary-only options sort last. 57 tests pass; all four caches refreshed and checked. Added backend/jobs.py for cache version v1-urinary-6; PLAN.md already had the tags example. T27 remains gated on UI T19/T25; pre-existing lockfile edits will be restored unchanged after sync.
+
+F6 done: short wrapping status badges, urinary-only option sub-labels, and Genome Firewall tab title; frontend build passes. Added JobScreen.jsx to pass calls into SummaryBar for tags; pre-existing package-lock.json edits preserved. T27 waits on unchecked T19/T25.
