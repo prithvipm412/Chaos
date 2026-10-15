@@ -53,6 +53,8 @@ export function useJobPolling(jobId) {
           timerRef.current = setTimeout(poll, interval);
         } else {
           // Terminal API error (e.g. 404 JOB_NOT_FOUND)
+          consecutiveFailuresRef.current = 0;
+          setConnectionLost(false);
           setError(err);
           stopped = true;
         }

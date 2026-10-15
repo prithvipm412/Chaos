@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import UploadScreen from './components/UploadScreen';
 import JobScreen from './components/JobScreen';
+import { useJobPolling } from './hooks/useJobPolling';
 
 function parseHash(hash) {
   const current = hash || window.location.hash || '#/';
@@ -13,6 +14,12 @@ function parseHash(hash) {
 
 export default function App() {
   const [route, setRoute] = useState(() => parseHash(window.location.hash));
+
+  let lastJobId = null;
+  try {
+    lastJobId = route.name === 'upload' ? localStorage.getItem('lastJobId') : null;
+  } catch { /* Storage may be disabled; direct job URLs still work. */ }
+  const { job: lastJob } = useJobPolling(lastJobId);
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -51,7 +58,14 @@ export default function App() {
 
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-8">
         {route.name === 'upload' ? (
-          <UploadScreen />
+          <>
+            {lastJob && ['queued', 'running'].includes(lastJob.status) && (
+              <a href={`#/job/${encodeURIComponent(lastJob.job_id)}`} className="block mb-6 rounded-xl border border-navy-800 bg-navy-900 p-4 text-sm font-medium text-accent">
+                Resume analysis in progress
+              </a>
+            )}
+            <UploadScreen />
+          </>
         ) : (
           <JobScreen jobId={route.jobId} />
         )}

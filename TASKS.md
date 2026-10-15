@@ -5,6 +5,26 @@ CORE checks run from `~/chaos`. UI checks run from `~/chaos-ui`. UI build check 
 UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
 
 ## FIX — lead puts urgent fixes here (do these first)
+- [ ] F3 [CORE] Headline must reflect poor QC, never a false "safe"
+  Files: backend/predict.py, backend/tests/test_predict.py
+  Do: Bug — on kpn_kpc_partial (QC grade poor, KPC-3 excluded by the truncated assembly) every NO_KNOWN call is
+  already correctly downgraded to UNCERTAIN (the per-call QC guard at the "NO_KNOWN and qc['grade']=='poor'" check
+  works), but the headline is computed separately from FAIL-rule hits only and defaults to
+  "No major acquired resistance found" when there is no FAIL call — it never looks at qc['grade'], so it reads as
+  reassuring on an incomplete genome. This is exactly the false-safe PLAN.md's three-state design forbids.
+  Fix: before the existing fail-priority headline loop, if qc['grade'] != 'good' and no FAIL call fired, set
+  headline = "Incomplete genome — results uncertain" (grade 'poor') or "Low-confidence genome — results uncertain"
+  (grade 'fair') instead of "No major acquired resistance found"; a FAIL call (e.g. carbapenemase) still produces
+  its normal headline regardless of QC grade, since a real hit is real evidence even on a rough assembly.
+  Interface: PLAN.md summary.headline — no JSON shape change, just this value's content on poor/fair QC with no FAIL.
+  Depends on: T15 (predict.py), T23 (kpn_kpc_partial sample)
+  Done when: a regression test loads the real kpn_kpc_partial sample (data/samples/kpn_kpc_partial.fasta via the
+  precomputed cache, or qc+hits reconstructed the way T28 does it) and asserts qc.grade == 'poor', every former
+  NO_KNOWN call is UNCERTAIN (no_known == 0, unchanged), and summary.headline contains "Incomplete genome" —
+  never "No major acquired resistance found". Full suite: `backend/.venv/bin/python -m pytest backend/tests -q`
+  passes, then `backend/.venv/bin/python scripts/precompute.py` to refresh the cached partial-sample headline
+  (bump jobs.RULES_VERSION first, per existing convention).
+
 - [x] F1 [UI] Light theme tokens + core surfaces
   Files: frontend/src/index.css, frontend/src/components/AntibiogramGrid.jsx, frontend/src/components/SummaryBar.jsx, frontend/src/components/PipelineProgress.jsx
   Do: Design change — the team is switching from navy to a clean light theme. In index.css `:root`, keep the SAME
@@ -261,7 +281,8 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   INTERRUPTED after calling the startup function.
 
 - [ ] T21 [CORE] Connection loss + refresh resilience
-  Files: frontend/src/hooks/useJobPolling.js, frontend/src/components/ConnectionBanner.jsx, frontend/src/App.jsx
+  Files: frontend/src/hooks/useJobPolling.js, frontend/src/components/ConnectionBanner.jsx, frontend/src/App.jsx, frontend/src/components/JobScreen.jsx
+  Note: JobScreen.jsx added to replace its existing inline banner with ConnectionBanner (required for fade-out).
   Do: Retagged from [UI] at the 14:00 review — UI lane is the critical path, this card's files don't overlap any
   still-open UI card, so Codex does it from `~/chaos` (check with `npm --prefix frontend run build` from there; the
   UI worktree picks it up on its next `git pull --rebase origin main`). After 3 consecutive NETWORK errors,
