@@ -183,3 +183,23 @@ F7 done: SummaryBar warns below chips when all remaining options carry urinary_t
 F7 print follow-up done: ReportHeader includes the same systemic-options warning when every remaining option is urinary-only; build passes and Chrome print-media checks using real KPC/K-12 results confirm warning visible only for KPC, with all 16 prediction rows retained.
 
 F8 done: colistin_mcr headline ranks after carbapenemase/ESBL; any other FAIL mechanism falls back to Resistance detected (<top gene>). RULES_VERSION v1-headline-8, all four caches rebuilt, 59 backend tests pass; saved real MCR-1.1 result now says Colistin-resistant (MCR-1.1), NDM-1 priority preserved. Pre-existing lockfile edits preserved.
+
+### Lead: CODE FREEZE — finalized DEMO.md/DECLARED.md, verified the held-out-genome claim before writing it
+- Before adding the user's requested validation claim to DEMO.md, verified it rather than taking it on faith:
+  fetched CP014755–CP014758 (K. pneumoniae AATZP) and CP016404–CP016405 (E. coli mcr-1) live from NCBI
+  (`efetch`, nucleotide db — confirmed both accessions/organisms first via `esummary`), then ran the unmodified
+  `qc`/`genes`/`blast`/`card`/`predict` functions on them directly (no new product code, a one-off script in my
+  scratchpad, deleted after). Real result: AATZP → Meropenem/Imipenem FAIL on NDM-1 at 100%/100%, headline
+  "Carbapenem-resistant (NDM-1)"; mcr-1 genome → Colistin FAIL on MCR-1.1 at 100%/100%, headline
+  "Colistin-resistant (MCR-1.1)", carbapenems correctly NO_KNOWN. This matched the user's claim; wrote it into
+  DEMO.md's judge Q&A with the exact per-genome attribution (carbapenems fail on the KP genome, colistin fails on
+  the E. coli genome — not both on both, which is what was asked for but not quite how two different genomes
+  work). Declared both accessions in DECLARED.md as a one-off validation run, not a shipped sample or feature.
+- DEMO.md: dropped "draft" from the title, removed a stale line referencing retry/print as "still separate task
+  cards" (both shipped), added a demo beat for F7's urinary-only warning, and added the full 1-page architecture
+  explainer + judge Q&A section CLAUDE.md asks for at freeze (pipeline, why rules-not-ML, the 5 engineered
+  judgement calls, robustness, the held-out validation above, known limitations).
+- README.md: added `scripts/run_demo.sh`/`stop_demo.sh` usage (was missing — the scripts existed but were
+  undocumented) and linked DEMO.md from the final references line.
+- Final verification: `backend/.venv/bin/python -m pytest backend/tests -q` → 59 passed; `npm --prefix frontend
+  run build` → succeeds. Tagging `v1.0-submission`.

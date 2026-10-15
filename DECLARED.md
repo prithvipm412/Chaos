@@ -43,3 +43,14 @@ Public NCBI assembled genomes, downloaded with pinned accession versions by scri
 The ICU blood-culture label is a demo scenario, not a newly collected patient specimen. Exact NCBI download URLs and FASTA SHA-256 checksums are recorded locally in data/samples/sources.tsv and checksums.sha256.
 
 scripts/make_demo_inputs.sh derives the fourth card, kpn_kpc_partial.fasta, from the first 60 × 20 kb fragments of the KPNIH1 chromosome (1.2 Mb; plasmids excluded). demo_inputs/genome_small.fasta.gz contains 20 kb of the same genome. demo_inputs/protein.fasta contains three CARD protein references and inherits CARD's restrictions. Empty, header-only and text fixtures are synthetic invalid inputs. Mock UI JSON and cached results are project-generated fixtures/outputs based on these inputs; they are not additional clinical datasets.
+
+### Held-out validation genomes (not shipped as app samples)
+
+At code freeze, two further public NCBI genomes were fetched via NCBI E-utilities (`efetch`, nucleotide database) and run once through the unmodified pipeline, to check the rule table generalizes beyond the 4 samples used during development (see DEMO.md "Validation beyond the 4 demo samples" for results):
+
+| Organism and strain | Accessions (chromosome + plasmids) | Notable marker |
+| --- | --- | --- |
+| Klebsiella pneumoniae AATZP | CP014755–CP014758 | NDM-1 carbapenemase (plasmid pNDM-1fa) |
+| Escherichia coli strain 210221272 | CP016404–CP016405 | mcr-1.1 colistin resistance (plasmid pSLy21) |
+
+These FASTA files are not committed (ignored `data/`, same as the 4 demo samples) and are not referenced by any application code or task card — this was a one-off lead verification run, not a product feature.

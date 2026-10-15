@@ -41,6 +41,10 @@ npm run dev -- --host localhost --port 5173 --strictPort
 
 Open http://localhost:5173. UI defaults to http://localhost:8000; `VITE_API_BASE` overrides it. UI mock mode: http://localhost:5173/?mock. Keep UI files in its lane. CORE sync: `git pull --rebase && git push`; UI sync: `git pull --rebase origin main && git push origin HEAD:main`.
 
+### Or one command for the demo
+
+After the setup above has run once, `scripts/run_demo.sh` frees ports 8000/5173, starts both servers detached (so they survive the launching terminal closing), warms/verifies all four sample caches, and health-checks both before returning; logs go to `data/demo/{backend,frontend}.log`. Open http://127.0.0.1:5173/#/ (no `mock`/`simulate` query) once it prints ready. Stop everything with `scripts/stop_demo.sh` (safe to run even if nothing is up). See [DEMO.md](DEMO.md) for the full script.
+
 ## Verify and demonstrate
 
 From `~/chaos`:
@@ -58,4 +62,4 @@ From `~/chaos-ui`: `npm --prefix frontend run build`.
 
 Demo checks: KPNIH1 → Meropenem FAIL with KPC-3 evidence; EC958 → Ceftriaxone FAIL and Meropenem not FAIL; K-12 → zero FAIL despite intrinsic gene hits; incomplete sample → poor QC and zero NO_KNOWN calls. See [demo_inputs/README.md](demo_inputs/README.md) for invalid-upload fixtures. Form `simulate=blast_timeout` bypasses cache and deliberately fails the BLAST step; Retry removes simulation. Real BLAST timeout is 300 seconds. Upload limit is 25 MiB, gzip expansion limit 100 MiB.
 
-See [PLAN.md](PLAN.md) for exact interfaces and [HANDOFF.md](HANDOFF.md) for measurements and review notes. The initial health-check/frontend boilerplate is declared in [DECLARED.md](DECLARED.md).
+See [PLAN.md](PLAN.md) for exact interfaces, [HANDOFF.md](HANDOFF.md) for measurements and review notes, and [DEMO.md](DEMO.md) for the demo script, failure demos and architecture Q&A. The initial health-check/frontend boilerplate and all third-party components/datasets are declared in [DECLARED.md](DECLARED.md).
