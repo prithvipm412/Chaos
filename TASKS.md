@@ -310,7 +310,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Depends on: T10
   Done when: tests for gzip ok, corrupt gzip, binary junk, CRLF file, oversized upload (via TestClient) all pass.
 
-- [ ] T19 [UI] Error states + retry
+- [x] T19 [UI] Error states + retry
   Files: frontend/src/components/ErrorPanel.jsx, frontend/src/components/UploadScreen.jsx, frontend/src/components/JobScreen.jsx, frontend/src/api.js
   Do: ErrorPanel({title, message, hint, action}). Upload ApiError → panel under the drop zone with the backend message+hint
   (and a specific icon per code). Failed job → panel showing the failed step, error.message, and a "Retry" button if retryable

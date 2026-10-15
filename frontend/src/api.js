@@ -77,8 +77,8 @@ export async function createJob({ file, sampleId, simulate } = {}) {
       throw new ApiError(
         400,
         'PROTEIN_FASTA',
-        'This looks like a protein file. Upload the assembled DNA genome (contigs FASTA).',
-        'Check that your FASTA contains nucleotide sequences (A, C, G, T), not amino acids.'
+        'This looks like a protein file.',
+        'Upload the assembled DNA genome (contigs FASTA).'
       );
     }
     const jobId = 'j_mock01';

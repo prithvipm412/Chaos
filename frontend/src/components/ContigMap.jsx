@@ -58,7 +58,7 @@ export default function ContigMap({ contigs = [], hits = [], calls = [], onSelec
   const LABEL_W = 100;
   const MARKER_H = 14;
   const MARKER_MIN_W = 4;
-  const SVG_PADDING = { top: 8, bottom: 16, left: 8, right: 16 };
+  const SVG_PADDING = { top: 8, bottom: 16, left: 8, right: 68 };
   const totalHeight =
     SVG_PADDING.top +
     contigs.length * (TRACK_HEIGHT + TRACK_GAP) -
@@ -66,7 +66,7 @@ export default function ContigMap({ contigs = [], hits = [], calls = [], onSelec
     SVG_PADDING.bottom;
 
   // Width is determined by viewBox; we use 100% width in CSS
-  const VIEW_W = 700;
+  const VIEW_W = 740;
   const TRACK_W = VIEW_W - LABEL_W - SVG_PADDING.left - SVG_PADDING.right;
 
   const handleMarkerEnter = useCallback((e, hit) => {

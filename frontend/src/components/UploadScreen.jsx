@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { listSamples, createJob, ApiError } from '../api';
+import ErrorPanel from './ErrorPanel';
 
 const ALLOWED_EXTENSIONS = ['.fa', '.fasta', '.fna', '.gz'];
 const MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024; // 25 MB
@@ -17,13 +18,25 @@ function formatBytes(bytes) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
 }
 
+function getSimulateParam() {
+  if (typeof window === 'undefined') return undefined;
+  const searchParams = new URLSearchParams(window.location.search);
+  if (searchParams.has('simulate')) return searchParams.get('simulate') || undefined;
+  if (window.location.hash.includes('?')) {
+    const hashQuery = window.location.hash.split('?')[1];
+    const hashParams = new URLSearchParams(hashQuery);
+    if (hashParams.has('simulate')) return hashParams.get('simulate') || undefined;
+  }
+  return undefined;
+}
+
 export default function UploadScreen() {
   const [samples, setSamples] = useState([]);
   const [loadingSamples, setLoadingSamples] = useState(true);
   const [samplesError, setSamplesError] = useState(null);
 
   const [selectedFile, setSelectedFile] = useState(null);
-  const [clientError, setClientError] = useState('');
+  const [uploadError, setUploadError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
 
@@ -54,27 +67,42 @@ export default function UploadScreen() {
   }, []);
 
   const validateFile = (file) => {
-    if (!file) return 'No file selected.';
+    if (!file) return null;
     if (file.size === 0) {
-      return 'File is empty. Upload the assembled DNA genome (contigs FASTA).';
+      return {
+        code: 'EMPTY_FILE',
+        title: 'Empty file',
+        message: 'The selected file contains no data.',
+        hint: 'Upload the assembled DNA genome (contigs FASTA).',
+      };
     }
     if (file.size > MAX_FILE_SIZE_BYTES) {
-      return `File exceeds 25 MB (${formatBytes(file.size)}). Upload an assembled genome file under 25 MB.`;
+      return {
+        code: 'TOO_LARGE',
+        title: 'File too large',
+        message: `File exceeds 25 MB limit (${formatBytes(file.size)}).`,
+        hint: 'Upload an assembled genome file under 25 MB.',
+      };
     }
     if (!isValidExtension(file.name)) {
-      return 'Unsupported file extension. Please upload a .fa, .fasta, .fna, or .gz file.';
+      return {
+        code: 'NOT_FASTA',
+        title: 'Unsupported file format',
+        message: 'Unsupported file extension.',
+        hint: 'Please upload a .fa, .fasta, .fna, or .gz file.',
+      };
     }
-    return '';
+    return null;
   };
 
   const handleFileChange = (e) => {
-    setClientError('');
+    setUploadError(null);
     const file = e.target.files?.[0];
     if (!file) return;
 
     const error = validateFile(file);
     if (error) {
-      setClientError(error);
+      setUploadError(error);
       setSelectedFile(null);
       if (fileInputRef.current) fileInputRef.current.value = '';
     } else {
@@ -98,14 +126,14 @@ export default function UploadScreen() {
     e.preventDefault();
     e.stopPropagation();
     setIsDragOver(false);
-    setClientError('');
+    setUploadError(null);
 
     const file = e.dataTransfer.files?.[0];
     if (!file) return;
 
     const error = validateFile(file);
     if (error) {
-      setClientError(error);
+      setUploadError(error);
       setSelectedFile(null);
     } else {
       setSelectedFile(file);
@@ -116,15 +144,14 @@ export default function UploadScreen() {
     if (!fileToUpload) return;
     const error = validateFile(fileToUpload);
     if (error) {
-      setClientError(error);
+      setUploadError(error);
       return;
     }
 
     try {
       setSubmitting(true);
-      setClientError('');
-      const urlParams = new URLSearchParams(window.location.search);
-      const simulate = urlParams.get('simulate') || undefined;
+      setUploadError(null);
+      const simulate = getSimulateParam();
       const res = await createJob({ file: fileToUpload, simulate });
       if (res?.job_id) {
         localStorage.setItem('lastJobId', res.job_id);
@@ -134,9 +161,19 @@ export default function UploadScreen() {
       }
     } catch (err) {
       if (err instanceof ApiError) {
-        setClientError(`${err.message}${err.hint ? ' ' + err.hint : ''}`);
+        setUploadError({
+          code: err.code,
+          title: err.code === 'PROTEIN_FASTA' ? 'Protein sequence detected' : (err.code ? `Error: ${err.code}` : 'Upload failed'),
+          message: err.message,
+          hint: err.hint,
+        });
       } else {
-        setClientError(err.message || 'Failed to submit analysis');
+        setUploadError({
+          code: 'UNKNOWN',
+          title: 'Submission failed',
+          message: err.message || 'Failed to submit analysis',
+          hint: 'Please check your connection and try again.',
+        });
       }
     } finally {
       setSubmitting(false);
@@ -146,9 +183,8 @@ export default function UploadScreen() {
   const handleSelectSample = async (sample) => {
     try {
       setSubmitting(true);
-      setClientError('');
-      const urlParams = new URLSearchParams(window.location.search);
-      const simulate = urlParams.get('simulate') || undefined;
+      setUploadError(null);
+      const simulate = getSimulateParam();
       const res = await createJob({ sampleId: sample.id, simulate });
       if (res?.job_id) {
         localStorage.setItem('lastJobId', res.job_id);
@@ -158,9 +194,19 @@ export default function UploadScreen() {
       }
     } catch (err) {
       if (err instanceof ApiError) {
-        setClientError(`${err.message}${err.hint ? ' ' + err.hint : ''}`);
+        setUploadError({
+          code: err.code,
+          title: err.code === 'PROTEIN_FASTA' ? 'Protein sequence detected' : (err.code ? `Error: ${err.code}` : 'Upload failed'),
+          message: err.message,
+          hint: err.hint,
+        });
       } else {
-        setClientError(err.message || 'Failed to submit sample analysis');
+        setUploadError({
+          code: 'UNKNOWN',
+          title: 'Submission failed',
+          message: err.message || 'Failed to submit sample analysis',
+          hint: 'Please check your connection and try again.',
+        });
       }
     } finally {
       setSubmitting(false);
@@ -239,25 +285,22 @@ export default function UploadScreen() {
           )}
         </div>
 
-        {clientError && (
-          <div
-            role="alert"
-            className="p-4 rounded-xl bg-fail-bg border border-fail-border text-fail text-sm flex items-start gap-3"
-          >
-            <svg className="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-            <div className="leading-relaxed font-medium">{clientError}</div>
-          </div>
+        {uploadError && (
+          <ErrorPanel
+            code={uploadError.code}
+            title={uploadError.title}
+            message={uploadError.message}
+            hint={uploadError.hint}
+          />
         )}
 
         <div className="flex justify-end pt-2">
           <button
             type="button"
-            disabled={!selectedFile || submitting}
+            disabled={!selectedFile || submitting || Boolean(uploadError)}
             onClick={() => triggerUpload(selectedFile)}
             className={`px-6 py-2.5 rounded-xl font-medium text-sm transition-all shadow-2xs ${
-              selectedFile && !submitting
+              selectedFile && !submitting && !uploadError
                 ? 'bg-accent text-white hover:bg-blue-700 active:scale-98 cursor-pointer'
                 : 'bg-gray-100 text-gray-400 border border-border cursor-not-allowed'
             }`}
