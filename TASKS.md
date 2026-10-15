@@ -182,7 +182,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Done when: the mock shows acrB in the "not used" section.
 
 ## M3 — Robustness + failure demos (target 16:10)
-- [ ] T18 [CORE] Input hardening
+- [x] T18 [CORE] Input hardening
   Files: backend/qc.py, backend/main.py, backend/tests/test_qc.py
   Do: gzip detected by magic bytes 1f8b → decompress, with the decompressed size capped at 100 MB (BAD_GZIP if corrupt). Upload larger than
   MAX_UPLOAD_BYTES → 413 TOO_LARGE (check while reading, don't load unbounded data). No file and no sample → NO_INPUT. Unknown sample → UNKNOWN_SAMPLE.
