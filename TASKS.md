@@ -191,7 +191,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Done when: tests cover KPC-3→carbapenemase, NDM-1, OXA-48, OXA-1→narrow, CTX-M-15→ESBL, TEM-1→narrow, SHV-12→ESBL,
   SHV-1→narrow, CMY-2→AmpC, armA, mcr-1, acrB→intrinsic, EC-5→intrinsic.
 
-- [ ] T14 [UI] Contig map
+- [x] T14 [UI] Contig map
   Files: frontend/src/components/ContigMap.jsx, frontend/src/components/JobScreen.jsx
   Do: An SVG with one horizontal bar per contig in result.contigs (length scaled to the longest), and hit markers at start/end
   coloured by tier (exact solid, strict outline, partial dashed). Markers with used_for_calls:false are grey. Hover shows a tooltip

@@ -6,6 +6,8 @@ import AntibiogramGrid from './AntibiogramGrid';
 import EvidenceDrawer from './EvidenceDrawer';
 import QcPanel from './QcPanel';
 import ConnectionBanner from './ConnectionBanner';
+import ContigMap from './ContigMap';
+
 
 export default function JobScreen({ jobId }) {
   const { job, error, connectionLost } = useJobPolling(jobId);
@@ -124,6 +126,14 @@ export default function JobScreen({ jobId }) {
                   </div>
                 </div>
               )}
+
+              {/* Contig Map */}
+              <ContigMap
+                contigs={job.result.contigs || []}
+                hits={job.result.hits || []}
+                calls={job.result.calls || []}
+                onSelectCall={(call) => setSelectedCall(call)}
+              />
 
               <AntibiogramGrid
                 calls={job.result.calls}
