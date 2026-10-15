@@ -368,7 +368,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Depends on: T17
   Done when: the browser print preview shows a clean 1–2 page report.
 
-- [ ] T25 [UI] Visual polish
+- [x] T25 [UI] Visual polish
   Files: frontend/src/index.css, frontend/src/components/AntibiogramGrid.jsx, frontend/src/components/PipelineProgress.jsx, frontend/src/components/UploadScreen.jsx, frontend/src/components/JobScreen.jsx, .vscode/settings.json, .vscode/tailwind.css-data.json
   Note: JobScreen wires the running skeleton; editor custom data recognizes Tailwind @theme without suppressing CSS validation.
   Do: Status colour tokens in index.css (--fail, --uncertain, --noknown), a staggered fade-in of the tiles, a pulse on the running step,

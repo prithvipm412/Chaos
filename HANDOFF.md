@@ -147,3 +147,5 @@ F5 done: calls carry urinary_tract_only tags for Nitrofurantoin/Fosfomycin (empt
 
 F6 done: short wrapping status badges, urinary-only option sub-labels, and Genome Firewall tab title; frontend build passes. Added JobScreen.jsx to pass calls into SummaryBar for tags; pre-existing package-lock.json edits preserved. T27 waits on unchecked T19/T25.
 T19 done: ErrorPanel with per-code icons, UploadScreen error state, Analyze button disabled on validation error, single-sentence protein error, retryable failed job with retryJob and remounted polling, 404 state, URL simulate support; also ContigMap right-edge length label given breathing room.
+
+T25 done: staggered tiles, active-step pulse, six-group loading skeleton and sample hover lift respect reduced motion; JobScreen added for skeleton wiring, .vscode CSS custom data added for @theme warning; frontend build passes.
