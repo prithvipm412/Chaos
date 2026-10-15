@@ -383,7 +383,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Depends on: T22
   Done when: a TestClient test lists 2 created jobs, newest first.
 
-- [ ] T27 [CORE] Recent analyses list
+- [x] T27 [CORE] Recent analyses list
   Files: frontend/src/components/UploadScreen.jsx, frontend/src/api.js
   Do: Retagged from [UI] at the 14:00 review. These 2 files are ALSO touched by still-open UI cards (T12, T19, T25,
   F2) — do not start until all of them are merged to main, to avoid both lanes editing the same file at once; check

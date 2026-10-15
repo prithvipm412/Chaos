@@ -149,3 +149,5 @@ F6 done: short wrapping status badges, urinary-only option sub-labels, and Genom
 T19 done: ErrorPanel with per-code icons, UploadScreen error state, Analyze button disabled on validation error, single-sentence protein error, retryable failed job with retryJob and remounted polling, 404 state, URL simulate support; also ContigMap right-edge length label given breathing room.
 
 T25 done: staggered tiles, active-step pulse, six-group loading skeleton and sample hover lift respect reduced motion; JobScreen added for skeleton wiring, .vscode CSS custom data added for @theme warning; frontend build passes.
+
+T27 done: recent analyses below samples lists up to five jobs with label, status, local time and job links; hidden on errors. Existing listJobs API and two mock rows reused; frontend build passes. Pre-existing package-lock.json edits preserved.
