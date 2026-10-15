@@ -140,3 +140,5 @@ T17 done: collapsible GenesTable with "Used for predictions" and "Intrinsic — 
 - PLAN.md updated: engineered-core points 6 (headline, now also documents F3's poor-QC case that was missing),
   7 (mutation-driven drugs), 8 (tags + urinary-only sort); Job JSON calls[] gained `tags`.
 
+
+F4 done: Ciprofloxacin/Colistin/Tigecycline default to low-confidence UNCERTAIN when no gene evidence exists and leave options; acquired evidence and Nitrofurantoin handling retained. 56 tests pass; all four caches rebuilt with v1-mutation-5. Pre-existing frontend/package-lock.json metadata edits temporarily stashed for commit/sync isolation, to restore at session end.

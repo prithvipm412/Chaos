@@ -5,7 +5,7 @@ CORE checks run from `~/chaos`. UI checks run from `~/chaos-ui`. UI build check 
 UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
 
 ## FIX — lead puts urgent fixes here (do these first)
-- [ ] F4 [CORE] Don't call NO_KNOWN for drugs that are usually mutation-resistant
+- [x] F4 [CORE] Don't call NO_KNOWN for drugs that are usually mutation-resistant
   Files: backend/predict.py, backend/tests/test_predict.py, backend/jobs.py
   Note: jobs.py is for the required RULES_VERSION cache bump, same pattern as F3.
   Do: Bug (user testing) — we don't detect point mutations, so NO_KNOWN overclaims for Ciprofloxacin, Colistin and
