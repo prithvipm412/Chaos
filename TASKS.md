@@ -8,7 +8,8 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
 
 ## FIX — lead puts urgent fixes here (do these first)
 - [x] F7 [UI] Warn when every remaining option is urinary-only
-  Files: frontend/src/components/SummaryBar.jsx
+  Files: frontend/src/components/SummaryBar.jsx, frontend/src/components/ReportHeader.jsx
+  Note: User-requested follow-up also includes the same conditional warning in the print-only report.
   Do: User testing — the KPC sample's `options` is now just `["Nitrofurantoin"]` (correct per F4/F5, but a doctor
   glancing at one green chip could miss that it's not usable for this infection). Pure client-side check, no
   backend change: in the options block, if `options.length > 0` and every option's matching call has

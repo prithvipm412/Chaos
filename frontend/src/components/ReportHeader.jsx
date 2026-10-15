@@ -10,6 +10,10 @@ function percent(value) {
 
 export default function ReportHeader({ job }) {
   const result = job.result;
+  const options = result.summary?.options || [];
+  const urinaryOnlyOptions = options.length > 0 && options.every((option) =>
+    result.calls?.find((call) => call.antibiotic === option)?.tags?.includes('urinary_tract_only')
+  );
   const hits = (result.hits || []).filter((hit) => hit.used_for_calls);
   return (
     <section className="print-report" aria-label="Printable analysis report">
@@ -22,6 +26,11 @@ export default function ReportHeader({ job }) {
       </dl>
       <h2>{result.summary?.headline}</h2>
       {(result.qc?.warnings || []).map((warning, index) => <p key={index}>{warning}</p>)}
+      {urinaryOnlyOptions && (
+        <p className="font-semibold">
+          No systemic options with no known resistance — consult microbiology / infectious diseases.
+        </p>
+      )}
       <table>
         <caption>Antibiotic predictions</caption>
         <thead><tr><th>Antibiotic</th><th>Prediction</th><th>Confidence</th><th>Evidence / limitation</th></tr></thead>
