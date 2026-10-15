@@ -154,7 +154,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Depends on: T08
   Done when: the mock shows 5 contigs with 4 markers and a working tooltip.
 
-- [ ] T15 [CORE] Prediction engine v1
+- [x] T15 [CORE] Prediction engine v1
   Files: backend/predict.py, backend/jobs.py, backend/tests/test_predict.py
   Do: Implement PLAN.md "Engineered core" steps 1–6 exactly. This covers best hit per ORF by bitscore (do it in jobs.py annotation),
   tiers, rule effects, origin via rules.classify (intrinsic → used_for_calls:false + rule "intrinsic"; only acquired can FAIL; unclassified → at most UNCERTAIN), allele caution
