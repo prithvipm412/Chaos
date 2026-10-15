@@ -280,7 +280,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Done when: TestClient test: simulate → failed BLAST_TIMEOUT → retry → done. Also a hand-written running job.json gets marked
   INTERRUPTED after calling the startup function.
 
-- [ ] T21 [CORE] Connection loss + refresh resilience
+- [x] T21 [CORE] Connection loss + refresh resilience
   Files: frontend/src/hooks/useJobPolling.js, frontend/src/components/ConnectionBanner.jsx, frontend/src/App.jsx, frontend/src/components/JobScreen.jsx
   Note: JobScreen.jsx added to replace its existing inline banner with ConnectionBanner (required for fade-out).
   Do: Retagged from [UI] at the 14:00 review — UI lane is the critical path, this card's files don't overlap any

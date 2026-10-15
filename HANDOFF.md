@@ -106,3 +106,14 @@ T29 done: all 16 drugs ranked narrowest/first-line to last-resort, NO_KNOWN opti
 T12 done: verified real backend integration against :8000; eco_ctxm sample completes with Ceftriaxone FAIL and accurate prediction payload.
 F1 done: switched UI to clean light theme tokens in index.css and updated AntibiogramGrid, SummaryBar, PipelineProgress with accessible status tokens.
 F2 done: replaced dark-tuned Tailwind shades in EvidenceDrawer, QcPanel, JobScreen, UploadScreen with light theme tokens; all UI components use tokens only.
+
+### Lead: FIX F3 added — false "safe" headline on incomplete genome
+- Confirmed live in the cached kpn_kpc_partial result: qc.grade=poor, no_known=0 (per-call QC downgrade to
+  UNCERTAIN already works), but summary.headline is still "No major acquired resistance found" — reads as safe
+  on a genome we know is incomplete. Root cause: predict.py's headline loop only looks at FAIL-rule hits and
+  defaults to that string when there's no FAIL; it never checks qc['grade'], unlike the per-call guard a few lines
+  above it which does. Added F3 [CORE] at the top of TASKS.md (above F1/F2, which are both done): on poor/fair QC
+  with no FAIL call, headline becomes "Incomplete genome — results uncertain" / "Low-confidence genome — results
+  uncertain"; a real FAIL still overrides, since a hit is a hit regardless of assembly quality.
+
+T21 done: added fading token-based connection banner and running-job resume link; build and controlled polling check pass (3 NETWORK errors, retained job, 5s backoff, INTERRUPTED recovery). Added JobScreen.jsx to card to replace its inline banner; live browser stop/restart check unavailable. T27 remains gated on UI T12/T19/T25.
