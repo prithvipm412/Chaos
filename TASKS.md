@@ -226,7 +226,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Depends on: T15
   Done when: after precompute, the kpn_kpc job reaches done in < 3 s.
 
-- [ ] T23 [CORE] Demo inputs: partial genome + bad files
+- [x] T23 [CORE] Demo inputs: partial genome + bad files
   Files: scripts/make_demo_inputs.sh, demo_inputs/README.md, backend/samples.py
   Generated-file exception: commit demo_inputs/protein.fasta, empty.fasta, notes.txt, header_only.fasta, genome_small.fasta.gz, explicitly required below.
   Do: The script writes data/samples/kpn_kpc_partial.fasta: chop the kp_kpc chromosome (the longest contig) into 20 kb pieces and
