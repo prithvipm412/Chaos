@@ -1,10 +1,11 @@
 # HANDOFF.md — shared memory between agents. Append only, newest at bottom.
 
 ## Current state (lead rewrites this block at each review)
-- Milestone: M0
-- Works: -
-- Broken / risks: -
-- Next 3 cards: -
+- Milestone: M0 (plan written 13:45; freeze 16:30)
+- Works: boilerplate; BLAST 2.17.0 installed via brew (lead); setup spike in progress (Codex)
+- Broken / risks: CORE lane has 13 cards in ~165 min, so it is the bottleneck. BLAST runtime unknown until the spike reports it.
+  K-12 intrinsic hits could make a naive engine overclaim (T13/T15/T16 handle this).
+- Next 3 cards: CORE T01 (after the spike) → T05 → T07; UI T02 → T03 → T04
 
 ## Log
 

@@ -34,5 +34,6 @@ Write `BLOCKED: <reason>` under the card, commit whatever works, move to the nex
 
 ## Git sync and safety
 - After every commit: `git pull --rebase` then `git push`.
+  [UI] lane (worktree ~/chaos-ui, branch `ui`): `git pull --rebase origin main && git push origin HEAD:main`.
 - If the rebase conflicts in HANDOFF.md or TASKS.md, keep BOTH sides' lines, `git add` the file, then `git rebase --continue`.
 - Never run `git push --force`, `git reset --hard`, `git clean`, or `rm -rf`, and never touch files outside this repo.
