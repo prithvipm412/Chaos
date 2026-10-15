@@ -164,7 +164,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Done when: tests pass for KPC → all 8 beta-lactams FAIL plus a carbapenem headline; CTX-M-15 only → Meropenem NO_KNOWN and Ceftriaxone FAIL;
   acrB only → all NO_KNOWN; sul1 alone → Co-trimoxazole UNCERTAIN; poor QC → zero NO_KNOWN; the real K-12 hits loaded from data/spike/ecoli_k12.hits.tsv → zero FAIL (skip the test if the file is missing).
 
-- [ ] T16 [CORE] Validate on the 3 real samples
+- [x] T16 [CORE] Validate on the 3 real samples
   Files: scripts/run_samples.py, backend/rules.py
   Do: Known real markers (spike): kp_kpc KPC-3, SHV-11, TEM-1, FosA6, oqxAB, sul1, dfrA12;
   eco_ctxm CTX-M-15, CMY-23, OXA-1, TEM-1, sul1, tet(A); eco_k12 ampC + efflux only. The script runs the pipeline functions directly (no server) on each sample and prints a table of antibiotic × status,
