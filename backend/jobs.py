@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 
 from backend.config import JOBS_DIR, CACHE_DIR
 
-RULES_VERSION = 'v1-urinary-6'
+RULES_VERSION = 'v1-headline-8'
 _QUEUE = queue.Queue()
 _LOCK = threading.RLock()
 STEPS = [('qc', 'Genome QC'), ('genes', 'Gene calling'), ('blast', 'Resistance gene search'), ('predict', 'Antibiotic prediction')]

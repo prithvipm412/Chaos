@@ -74,6 +74,7 @@ def predict(hits: list[dict], qc: dict) -> dict:
             headline = 'Low-confidence genome — results uncertain'
     # Priority by mechanism, not genome position: a plasmid AmpC must never outrank a true ESBL for the headline.
     priority = [('carbapenemase', 'Carbapenem-resistant'), ('esbl', 'ESBL-producer'),
+                ('colistin_mcr', 'Colistin-resistant'),
                 ('plasmid_ampc', 'AmpC-producer'), ('narrow_beta_lactamase', 'Beta-lactamase-producer')]
     fail_ids = {h for c in calls if c['status'] == 'FAIL' for h in c['evidence']}
     fail_hits = [h for h in hits if h['hit_id'] in fail_ids]
@@ -82,6 +83,8 @@ def predict(hits: list[dict], qc: dict) -> dict:
         if hit:
             headline = f'{title} ({hit["gene"]})'
             break
+    if fail_hits and headline == 'No major acquired resistance found':
+        headline = f'Resistance detected ({fail_hits[0]["gene"]})'
     summary = dict(fail=sum(c['status'] == 'FAIL' for c in calls), uncertain=sum(c['status'] == 'UNCERTAIN' for c in calls),
                    no_known=sum(c['status'] == 'NO_KNOWN' for c in calls), headline=headline,
                    options=sorted([c['antibiotic'] for c in calls if c['status'] == 'NO_KNOWN'], key=lambda a: (a in URINARY_ONLY, SPECTRUM_RANK[a])),

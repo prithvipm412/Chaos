@@ -195,3 +195,25 @@ def test_urinary_tags_and_options_order():
     resistant = calls([hit('fosA3')])['Fosfomycin']
     assert resistant['status'] == 'FAIL'
     assert resistant['tags'] == ['urinary_tract_only']
+
+
+def test_mcr_headline_and_priority():
+    marker = hit('MCR-1.1', mechanism='antibiotic target alteration')
+    result = predict([marker], {'grade': 'good'})
+    colistin = next(c for c in result['calls'] if c['antibiotic'] == 'Colistin')
+    assert colistin['status'] == 'FAIL'
+    assert colistin['evidence'] == ['MCR-1.1']
+    assert result['summary']['headline'] == 'Colistin-resistant (MCR-1.1)'
+    for gene, headline in [('KPC-3', 'Carbapenem-resistant (KPC-3)'),
+                           ('CTX-M-15', 'ESBL-producer (CTX-M-15)')]:
+        assert predict([marker.copy(), hit(gene)], {'grade': 'good'})['summary']['headline'] == headline
+    assert predict([hit('CMY-2'), marker.copy()], {'grade': 'good'})['summary']['headline'] == 'Colistin-resistant (MCR-1.1)'
+
+
+def test_any_failure_has_resistance_headline():
+    # These acquired mechanisms have no dedicated headline title.
+    for gene in ('tet(X)', 'fosA3', 'armA'):
+        for grade in ('good', 'fair', 'poor'):
+            result = predict([hit(gene)], {'grade': grade})
+            assert result['summary']['fail'] > 0
+            assert result['summary']['headline'] == f'Resistance detected ({gene})'
