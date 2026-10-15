@@ -52,7 +52,15 @@ def annotate_hits(alignments, orfs):
     index = load_card_index(CARD_DIR)
     positions = {orf['orf_id']: orf for orf in orfs}
     hits = []
+    best = {}
     for alignment in alignments:
+        if alignment['identity'] < 50 or alignment['coverage'] < 50:
+            continue
+        previous = best.get(alignment['orf_id'])
+        rank = (alignment['bitscore'], alignment['identity'], alignment['coverage'])
+        if previous is None or rank > (previous['bitscore'], previous['identity'], previous['coverage']):
+            best[alignment['orf_id']] = alignment
+    for alignment in best.values():
         annotation = index.get(alignment['aro'])
         if not annotation:
             raise ValueError('CARD annotation missing for ' + alignment['aro'])
