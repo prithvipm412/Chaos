@@ -62,6 +62,11 @@ def predict(hits: list[dict], qc: dict) -> dict:
         calls.append(dict(antibiotic=drug['antibiotic'], group=drug['group'], status=status, confidence=confidence,
                           evidence=[h['hit_id'] for h in evidence], reason=reason))
     headline = 'No major acquired resistance found'
+    if not any(c['status'] == 'FAIL' for c in calls):
+        if qc['grade'] == 'poor':
+            headline = 'Incomplete genome — results uncertain'
+        elif qc['grade'] == 'fair':
+            headline = 'Low-confidence genome — results uncertain'
     # Priority by mechanism, not genome position: a plasmid AmpC must never outrank a true ESBL for the headline.
     priority = [('carbapenemase', 'Carbapenem-resistant'), ('esbl', 'ESBL-producer'),
                 ('plasmid_ampc', 'AmpC-producer'), ('narrow_beta_lactamase', 'Beta-lactamase-producer')]

@@ -114,3 +114,28 @@ def test_remaining_options_rank_and_note():
         call['antibiotic'] for call in resistant['calls'] if call['status'] == 'NO_KNOWN'
     }
     assert predict([], {'grade': 'poor'})['summary']['options'] == []
+
+
+def test_low_quality_headline_and_fail_priority():
+    for grade, headline in [('poor', 'Incomplete genome — results uncertain'),
+                            ('fair', 'Low-confidence genome — results uncertain')]:
+        assert predict([], {'grade': grade})['summary']['headline'] == headline
+        assert predict([hit('KPC-3')], {'grade': grade})['summary']['headline'] == 'Carbapenem-resistant (KPC-3)'
+    assert predict([], {'grade': 'good'})['summary']['headline'] == 'No major acquired resistance found'
+
+
+def test_real_partial_genome_headline():
+    from backend.jobs import execute_pipeline, read_cache
+    from backend.samples import available_samples
+
+    sample = next(s for s in available_samples() if s['id'] == 'kpn_kpc_partial')
+    data = sample['path'].read_bytes()
+    cached = read_cache(data)
+    result = cached['result'] if cached else execute_pipeline(data, lambda *args: None)
+    assert result['qc']['grade'] == 'poor'
+    # Re-run prediction so a pre-fix cache can never mask a headline regression.
+    prediction = predict(result['hits'], result['qc'])
+    assert prediction['summary']['no_known'] == 0
+    assert all(call['status'] == 'UNCERTAIN' for call in prediction['calls'])
+    assert 'Incomplete genome' in prediction['summary']['headline']
+    assert 'No major acquired resistance found' not in prediction['summary']['headline']
