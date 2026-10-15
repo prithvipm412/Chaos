@@ -361,7 +361,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Done when: the partial sample's run gives QC grade poor and zero NO_KNOWN calls.
 
 ## M4 — Polish (cut first if behind)
-- [ ] T24 [UI] Printable report
+- [x] T24 [UI] Printable report
   Files: frontend/src/components/ReportHeader.jsx, frontend/src/components/JobScreen.jsx, frontend/src/index.css
   Do: A "Print report" button. @media print: white background, hide the nav, drawer and buttons; show ReportHeader (sample label, job id,
   date, QC grade), then the grid as a table and the hits used, with the disclaimer in bold at the bottom.

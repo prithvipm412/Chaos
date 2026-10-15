@@ -151,3 +151,5 @@ T19 done: ErrorPanel with per-code icons, UploadScreen error state, Analyze butt
 T25 done: staggered tiles, active-step pulse, six-group loading skeleton and sample hover lift respect reduced motion; JobScreen added for skeleton wiring, .vscode CSS custom data added for @theme warning; frontend build passes.
 
 T27 done: recent analyses below samples lists up to five jobs with label, status, local time and job links; hidden on errors. Existing listJobs API and two mock rows reused; frontend build passes. Pre-existing package-lock.json edits preserved.
+
+T24 done: Print report action and print-only ReportHeader include sample/job/date/QC, 16 predictions, used genes and bold disclaimer; print CSS hides interactive UI and repeats table headers. Build and Chrome print-media checks pass on mock and real partial-genome results (roughly two A4 pages); no new dependencies.
