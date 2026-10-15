@@ -10,6 +10,7 @@ import ConnectionBanner from './ConnectionBanner';
 import ContigMap from './ContigMap';
 import GenesTable from './GenesTable';
 import ErrorPanel from './ErrorPanel';
+import ReportHeader from './ReportHeader';
 
 function JobScreenContent({ jobId, onRetry }) {
   const { job, error, connectionLost } = useJobPolling(jobId);
@@ -33,7 +34,8 @@ function JobScreenContent({ jobId, onRetry }) {
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto space-y-8">
+    <div className="job-screen w-full max-w-5xl mx-auto space-y-8">
+      {job?.status === 'done' && job.result && <ReportHeader job={job} />}
       <ConnectionBanner connectionLost={connectionLost} />
 
       {/* Terminal Error (e.g. 404) */}
@@ -139,6 +141,9 @@ function JobScreenContent({ jobId, onRetry }) {
           {/* Results section */}
           {job?.status === 'done' && job?.result && (
             <div id="results-container" className="space-y-8">
+              <div className="flex justify-end">
+                <button type="button" onClick={() => window.print()} className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-text hover:bg-bg-surface">Print report</button>
+              </div>
               <SummaryBar summary={job.result.summary} calls={job.result.calls || []} />
 
               {/* Genome QC Panel */}

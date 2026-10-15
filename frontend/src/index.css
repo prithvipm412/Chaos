@@ -142,3 +142,28 @@
     box-shadow: none !important;
   }
 }
+
+.print-report { display: none; }
+
+@media print {
+  @page { size: A4; margin: 12mm; }
+  html, body, #root { background: white !important; color: black !important; }
+  body { font-size: 9pt; }
+  body header, body footer, nav, button, [role="dialog"] { display: none !important; }
+  main { max-width: none !important; padding: 0 !important; margin: 0 !important; }
+  .job-screen { max-width: none !important; }
+  .job-screen > * { display: none !important; }
+  .job-screen > .print-report { display: block !important; margin: 0 !important; }
+  .print-report h1 { font-size: 18pt; font-weight: 700; }
+  .print-report h2 { font-size: 11pt; font-weight: 700; margin: 5mm 0 2mm; }
+  .print-report dl { display: grid; grid-template-columns: 25mm 1fr; gap: 1mm 3mm; }
+  .print-report dt { font-weight: 700; }
+  .print-report dd { margin: 0; }
+  .print-report table { width: 100%; border-collapse: collapse; margin-top: 4mm; table-layout: fixed; }
+  .print-report caption { text-align: left; font-size: 11pt; font-weight: 700; margin-bottom: 2mm; }
+  .print-report th, .print-report td { border: 1px solid #999; padding: 1.5mm; text-align: left; overflow-wrap: anywhere; vertical-align: top; }
+  .print-report thead { display: table-header-group; }
+  .print-report tr { break-inside: avoid; }
+  .print-report th:last-child, .print-report td:last-child { width: 36%; }
+  .report-disclaimer { font-weight: 700; margin-top: 5mm; break-inside: avoid; }
+}
