@@ -127,6 +127,12 @@ left `running` → failed `INTERRUPTED` (retryable) · retry endpoint · sha256 
 UI: job id in URL hash `#/job/<id>` + localStorage, resumes polling after refresh; fetch timeout 5 s;
 3 failed polls → "Connection lost — retrying" banner, keep last state, back off to 5 s.
 
+## Style (overrides CLAUDE.md's default navy — team decision at 14:00 review)
+Light theme, not navy: page #ffffff, surface #f5f6f8, border #e5e7eb, text #111827, secondary text #6b7280, one
+subtle accent. Status colours stay strong and WCAG-AA legible on white: LIKELY TO FAIL #dc2626 (red), UNCERTAIN
+#b45309 (amber), NO KNOWN RESISTANCE #15803d (green). Tokens live in frontend/src/index.css (FIX F1/F2); every
+component uses the tokens, never a new hardcoded hex or a dark-tuned Tailwind shade.
+
 ## Clock (build start 13:30, freeze 16:30)
 M0 14:00 skeleton E2E fake · M1 14:50 real pipeline on samples, grid shows · M2 15:35 rules engine ·
 M3 16:10 robustness + failure demos · M4 16:30 polish. Behind? Cut M4, then shrink M2 to T08 only.

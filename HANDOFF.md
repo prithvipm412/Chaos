@@ -1,13 +1,14 @@
 # HANDOFF.md — shared memory between agents. Append only, newest at bottom.
 
 ## Current state (lead rewrites this block at each review)
-- Milestone: M2 complete on CORE (all 13 original cards done); UI mid-M1 (T02/T03/T04/T06 done, T08 in progress). Freeze 16:30.
+- Milestone: CORE done through M2.5 (T01-T29 all checked, incl. T28/T29). UI at T11 done, T12 next. Freeze 16:30.
 - Works: full real pipeline (QC→genes→BLAST→predict) on all 3 real samples, cached, retry/interrupted recovery, input
-  hardening, demo fixtures. UI shell + grid against mocks.
-- Broken / risks: was broken, now fixed — EC958 headline named CMY-23 (AmpC) instead of CTX-M-15 (the real ESBL)
-  because predict.py picked the first evidence hit by genome position, not by mechanism. Fixed directly (see log).
-  UI lane is now the pace-setter: T08/T11/T12/T14/T17/T19/T21 before M3 robustness UI, then M4 polish.
-- Next 3 cards: UI T08 (finish, in progress) → T11 → T12 (switch off mocks — CORE's real API is ready and sample ids match);
+  hardening, demo fixtures, ranked "remaining options". UI shell + grid + QC panel against mocks.
+- Broken / risks: was broken, now fixed — EC958 headline named CMY-23 (AmpC) instead of CTX-M-15 (the real ESBL),
+  fixed in predict.py and pinned as a regression test in T28. DESIGN CHANGE at 14:00: dropping navy for a light
+  theme — see FIX F1/F2 at the top of TASKS.md and PLAN.md "Style". T21 and T27 retagged [UI]→[CORE] (see log) —
+  Codex now also has frontend cards; checks still run `npm --prefix frontend run build` from ~/chaos.
+- Next 3 cards: UI T12 (switch off mocks) → T14 → T17; CORE F1 (light theme tokens, do first) → F2 → T21 (clean, no file overlap)
   CORE spare-capacity T28 → T29 (M2.5, non-blocking)
 
 ## Review notes — review-1, 2026-10-15 ~14:00
@@ -77,3 +78,28 @@ T11 done: compact QcPanel displaying total length, contigs, N50, longest contig,
 T28 done: real API regression covers all 3 samples, origins and NO_KNOWN reasons; 51 tests pass. Added backend/jobs.py to card to bump cache version after detecting stale CMY-23 headlines; all four sample caches regenerated with correct CTX-M-15 headline.
 
 T29 done: all 16 drugs ranked narrowest/first-line to last-resort, NO_KNOWN options sorted and exact PLAN options_note added; 52 backend tests pass. Added backend/jobs.py to card for required cache version bump (v1-options-3); all four sample caches regenerated. All CORE cards complete.
+
+### Lead, 14:00 review follow-up: lane rebalance + theme change
+- Rebalance: UI lane is now the critical path (CORE finished T01-T29 early). Asked to retag 2 of the last
+  unstarted [UI] cards to [CORE]. Checked actual file overlap against every still-open UI card first:
+  - T21 (useJobPolling.js, ConnectionBanner.jsx, App.jsx) → retagged [UI]→[CORE]. Zero overlap with any other
+    open card (UI or CORE) — safe to start immediately.
+  - T24 (printable report) was the user's other named example, but its files (JobScreen.jsx, index.css) are
+    shared with FOUR other still-open UI cards (T12, T14, T17, F2) plus F1/T25 on index.css — retagging it would
+    put CORE and UI editing the same file at the same time, the exact thing this ask is meant to avoid. Substituted
+    **T27** (recent analyses list) instead: still shares UploadScreen.jsx/api.js with T12, T19, T25 and the new F2,
+    so it is retagged [UI]→[CORE] but with an explicit `Depends on: T26, T12, T19, T25, F2` — Codex must not start
+    it until all of those are merged to main. This keeps the two lanes' edits sequential on shared files instead
+    of concurrent, which is the real risk "no overlap" is protecting against.
+  - Both retagged cards note that Codex runs the frontend build check from `~/chaos` (same repo, main branch) and
+    that the UI worktree picks up the result on its next `git pull --rebase origin main`.
+- Design change: light theme replaces navy (team decision). Added FIX cards F1 and F2 at the top of TASKS.md
+  (still [UI] — this is UI surface work, not retagged). Split into two because the full set of files using
+  dark-tuned Tailwind shades (bg-red-950/*, text-*-300, etc. — tuned for the old dark navy backdrop, illegible on
+  white) is 9 component files, over the 4-files-per-card limit: F1 covers index.css (the actual token values —
+  App.jsx needs zero edits, it only ever used the token-bound classes) plus the 3 highest-visibility components
+  (AntibiogramGrid, SummaryBar, PipelineProgress); F2 covers the remaining 4 (EvidenceDrawer, QcPanel, JobScreen,
+  UploadScreen). PLAN.md gained a "Style" section documenting the override of CLAUDE.md's default navy instruction,
+  with the exact hex values, as the authoritative source for this project.
+- No lead edits to any frontend file itself — F1/F2/T21/T27 are task cards for the executors, per CLAUDE.md
+  ("you do not write feature code").

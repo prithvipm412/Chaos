@@ -5,6 +5,30 @@ CORE checks run from `~/chaos`. UI checks run from `~/chaos-ui`. UI build check 
 UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
 
 ## FIX — lead puts urgent fixes here (do these first)
+- [ ] F1 [UI] Light theme tokens + core surfaces
+  Files: frontend/src/index.css, frontend/src/components/AntibiogramGrid.jsx, frontend/src/components/SummaryBar.jsx, frontend/src/components/PipelineProgress.jsx
+  Do: Design change — the team is switching from navy to a clean light theme. In index.css `:root`, keep the SAME
+  variable/class names but change their VALUES: --navy-950 (page) → #ffffff, --navy-900 (surface) → #f5f6f8,
+  --navy-800 (border) → #e5e7eb, --text → #111827; add --text-secondary: #6b7280 and keep --accent as one subtle
+  accent colour. Add three new strong, WCAG-AA-legible status tokens: --fail: #dc2626, --uncertain: #b45309,
+  --no-known: #15803d (plus 10%-opacity *-soft variants for badge backgrounds). This alone re-themes every
+  component that already uses bg-navy-*/text-text/text-accent classes (App.jsx needs no edit). Then in
+  AntibiogramGrid.jsx, SummaryBar.jsx and PipelineProgress.jsx, replace the dark-tuned Tailwind status shades
+  (text-red-300, bg-red-950/20, bg-emerald-500/15, etc. — tuned for a dark backdrop, illegible on white) with the
+  new --fail/--uncertain/--no-known tokens (inline style or arbitrary-value classes). No layout changes.
+  Later UI cards must use these tokens, never a new hardcoded hex or a dark-tuned Tailwind shade.
+  Depends on: none
+  Done when: `npm --prefix frontend run build` passes; `?mock#/job/j_mock01` shows a white page, grey surfaces, and
+  the summary chips + antibiogram grid in clearly legible solid red/amber/green on white.
+
+- [ ] F2 [UI] Light theme: remaining components
+  Files: frontend/src/components/EvidenceDrawer.jsx, frontend/src/components/QcPanel.jsx, frontend/src/components/JobScreen.jsx, frontend/src/components/UploadScreen.jsx
+  Do: Same replacement as F1 — swap every dark-tuned Tailwind status shade (bg-red-950/*, text-*-300, etc.) for the
+  --fail/--uncertain/--no-known/--text/--text-secondary tokens index.css now defines. No redesign, no layout change,
+  just correct contrast on the new white/grey background.
+  Depends on: F1
+  Done when: build passes; the upload screen, running/failed job screen, evidence drawer and QC panel are all
+  legible on white with no leftover pastel-on-dark text.
 
 ## M0 — Skeleton end to end with fake data (target 14:00)
 - [x] T01 [CORE] Job API skeleton with a fake runner
@@ -236,10 +260,13 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Done when: TestClient test: simulate → failed BLAST_TIMEOUT → retry → done. Also a hand-written running job.json gets marked
   INTERRUPTED after calling the startup function.
 
-- [ ] T21 [UI] Connection loss + refresh resilience
+- [ ] T21 [CORE] Connection loss + refresh resilience
   Files: frontend/src/hooks/useJobPolling.js, frontend/src/components/ConnectionBanner.jsx, frontend/src/App.jsx
-  Do: After 3 consecutive NETWORK errors, connectionLost=true → a sticky top banner "Connection lost — retrying…". Keep the last
-  job shown and back off to a 5 s poll. When the connection recovers, the banner fades out. Opening `#/` while localStorage.lastJobId is
+  Do: Retagged from [UI] at the 14:00 review — UI lane is the critical path, this card's files don't overlap any
+  still-open UI card, so Codex does it from `~/chaos` (check with `npm --prefix frontend run build` from there; the
+  UI worktree picks it up on its next `git pull --rebase origin main`). After 3 consecutive NETWORK errors,
+  connectionLost=true → a sticky top banner "Connection lost — retrying…". Keep the last job shown and back off to
+  a 5 s poll. When the connection recovers, the banner fades out. Opening `#/` while localStorage.lastJobId is
   running shows a "Resume analysis in progress" link.
   Depends on: T04
   Done when: stopping the backend mid-run shows the banner, and restarting it resumes to done (or to INTERRUPTED with Retry).
@@ -284,8 +311,12 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Depends on: T22
   Done when: a TestClient test lists 2 created jobs, newest first.
 
-- [ ] T27 [UI] Recent analyses list
+- [ ] T27 [CORE] Recent analyses list
   Files: frontend/src/components/UploadScreen.jsx, frontend/src/api.js
-  Do: Under the samples, show the last 5 jobs from listJobs(5) (label, status chip, time) linking to #/job/<id>. Hide the list on error.
-  Depends on: T26 (mock: return 2 fake rows)
+  Do: Retagged from [UI] at the 14:00 review. These 2 files are ALSO touched by still-open UI cards (T12, T19, T25,
+  F2) — do not start until all of them are merged to main, to avoid both lanes editing the same file at once; check
+  `git log --oneline -5` for T12/T19/T25/F2 commits first. From `~/chaos`: pull main, then under the samples show
+  the last 5 jobs from listJobs(5) (label, status chip, time) linking to #/job/<id>. Hide the list on error.
+  Check with `npm --prefix frontend run build` from `~/chaos`.
+  Depends on: T26, T12, T19, T25, F2 (wait for all; mock: return 2 fake rows)
   Done when: the list shows and the links open the job.
