@@ -1,4 +1,5 @@
 import json
+import hashlib
 import os
 import queue
 import secrets
@@ -6,8 +7,9 @@ import threading
 import time
 from datetime import datetime, timezone
 
-from backend.config import JOBS_DIR
+from backend.config import JOBS_DIR, CACHE_DIR
 
+RULES_VERSION = 'v1-origin-1'
 _QUEUE = queue.Queue()
 _LOCK = threading.RLock()
 STEPS = [('qc', 'Genome QC'), ('genes', 'Gene calling'), ('blast', 'Resistance gene search'), ('predict', 'Antibiotic prediction')]
@@ -140,6 +142,35 @@ def execute_pipeline(data, update=None, simulate=None):
                 hits=hits, **prediction)
 
 
+def cache_key(data):
+    return hashlib.sha256(data).hexdigest() + '_' + RULES_VERSION
+
+
+def read_cache(data):
+    try:
+        entry = json.loads((CACHE_DIR / (cache_key(data) + '.json')).read_text())
+        result, steps = entry['result'], entry['steps']
+        if not isinstance(result, dict) or not {'qc', 'genes_called', 'contigs', 'hits', 'calls', 'summary', 'disclaimer'} <= result.keys():
+            return None
+        if len(result['calls']) != 16 or len(steps) != 4 or any(not isinstance(s['detail'], str) for s in steps):
+            return None
+        return entry
+    except (OSError, ValueError, KeyError, TypeError):
+        return None
+
+
+def write_cache(data, result, steps):
+    try:
+        CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        path = CACHE_DIR / (cache_key(data) + '.json')
+        temporary = path.with_suffix(f'.{os.getpid()}.{threading.get_ident()}.tmp')
+        temporary.write_text(json.dumps(dict(result=result, steps=steps)))
+        os.replace(temporary, path)
+        return True
+    except OSError:
+        return False  # Cache failure must never discard a successful analysis.
+
+
 def run_job(job):
     from backend.blast import BlastError
     job['status'] = 'running'
@@ -152,7 +183,17 @@ def run_job(job):
 
     try:
         data = (JOBS_DIR / job['job_id'] / 'input.fasta').read_bytes()
-        job['result'] = execute_pipeline(data, update, job.get('simulate'))
+        cached = read_cache(data) if not job.get('simulate') else None
+        if cached:
+            job['cached'] = True
+            for index, step in enumerate(cached['steps']):
+                update(index, 'running', 0, '')
+                time.sleep(.3)
+                update(index, 'done', .3, step['detail'])
+            job['result'] = cached['result']
+        else:
+            job['result'] = execute_pipeline(data, update, job.get('simulate'))
+            write_cache(data, job['result'], job['steps'])
         job.update(status='done', progress=1.0)
     except Exception as exc:
         code = exc.code if isinstance(exc, BlastError) else 'INTERNAL'
