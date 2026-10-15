@@ -177,3 +177,5 @@ T24 done: Print report action and print-only ReportHeader include sample/job/dat
 - Hard stop: nothing new starts after 16:15. Added that line to the TASKS.md header directly, since it applies
   to every remaining card, not just one.
 - `git tag review-2` after this commit.
+
+F7 done: SummaryBar warns below chips when all remaining options carry urinary_tract_only; real KPC result shows warning and K-12 does not. Build and rendered-component checks against live API results pass; empty, missing-tag and mixed-option cases retain prior behavior.
