@@ -1,4 +1,9 @@
 """DNA FASTA validation and assembly quality metrics."""
+import gzip
+import io
+import zlib
+
+MAX_DECOMPRESSED_BYTES = 100 * 1024 * 1024
 
 
 class InputError(Exception):
@@ -8,12 +13,22 @@ class InputError(Exception):
 
 
 def parse_and_qc(data: bytes) -> tuple[list[tuple[str, str]], dict]:
+    if data.startswith(b'\x1f\x8b'):
+        try:
+            with gzip.GzipFile(fileobj=io.BytesIO(data)) as stream:
+                data = stream.read(MAX_DECOMPRESSED_BYTES + 1)
+        except (OSError, EOFError, zlib.error) as exc:
+            raise InputError('BAD_GZIP', 'The compressed genome file is damaged.', 'Download or export the FASTA gzip again.') from exc
+        if len(data) > MAX_DECOMPRESSED_BYTES:
+            raise InputError('TOO_LARGE', 'The decompressed genome exceeds 100 MB.', 'Upload a smaller bacterial assembly.')
     if not data or not data.strip():
         raise InputError('EMPTY_FILE', 'The genome file is empty.')
     try:
         text = data.decode('utf-8-sig').strip()
     except UnicodeDecodeError as exc:
         raise InputError('NOT_FASTA', 'This is not a text DNA FASTA file.') from exc
+    if any(ord(char) < 32 and char not in '\n\r\t' for char in text):
+        raise InputError('NOT_FASTA', 'This contains binary data, not a text DNA FASTA file.')
     if not text.startswith('>'):
         raise InputError('NOT_FASTA', 'The file must start with a FASTA sequence header (>).')
     contigs, parts, identifier = [], [], None

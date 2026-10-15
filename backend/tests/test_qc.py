@@ -24,3 +24,43 @@ def test_n50_and_poor():
     assert qc['n50'] == 6000 and qc['n_contigs'] == 3
     assert qc['n_percent'] == 30 and qc['gc_percent'] == 10
     assert qc['grade'] == 'poor' and qc['warnings']
+
+
+def test_gzip_and_windows():
+    import gzip
+    data=b'>dna\r\n'+b'acgt'*500+b'\r\n'
+    contigs,qc=parse_and_qc(gzip.compress(data))
+    assert contigs==[('dna','ACGT'*500)]
+    assert qc['total_length']==2000
+
+
+@pytest.mark.parametrize('data,code', [(b'\x1f\x8bcorrupt','BAD_GZIP'),(b'\xff\xfe','NOT_FASTA'),
+    (b'>dna\nACGT\x00','NOT_FASTA')])
+def test_binary_and_corrupt(data,code):
+    with pytest.raises(InputError) as error:
+        parse_and_qc(data)
+    assert error.value.code==code
+
+
+def test_gzip_expansion_cap(monkeypatch):
+    import gzip
+    from backend import qc
+    monkeypatch.setattr(qc,'MAX_DECOMPRESSED_BYTES',1000)
+    with pytest.raises(InputError) as error:
+        parse_and_qc(gzip.compress(b'>dna\n'+b'A'*2000))
+    assert error.value.code=='TOO_LARGE'
+
+
+def test_upload_errors():
+    from fastapi.testclient import TestClient
+    from backend.main import app
+    from backend.config import MAX_UPLOAD_BYTES
+    with TestClient(app) as client:
+        r=client.post('/api/jobs',files={'file':('huge.fasta',b'A'*(MAX_UPLOAD_BYTES+1))})
+        assert r.status_code==413 and r.json()['error']['code']=='TOO_LARGE'
+        r=client.post('/api/jobs')
+        assert r.status_code==400 and r.json()['error']['code']=='NO_INPUT'
+        r=client.post('/api/jobs',data={'sample_id':'missing'})
+        assert r.status_code==400 and r.json()['error']['code']=='UNKNOWN_SAMPLE'
+        r=client.post('/api/jobs',files={'file':('bad.gz',b'\x1f\x8bcorrupt')})
+        assert r.status_code==400 and r.json()['error']['code']=='BAD_GZIP'

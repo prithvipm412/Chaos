@@ -1,6 +1,8 @@
 from fastapi import FastAPI, File, Form, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
+from backend.config import MAX_UPLOAD_BYTES
 
 from backend.jobs import create_job, get_job
 from backend.samples import available_samples
@@ -33,10 +35,21 @@ async def post_job(file: UploadFile | None = File(None), sample_id: str | None =
     if file is None and sample is None:
         return error_response('UNKNOWN_SAMPLE', 'This sample is unavailable.')
     try:
-        data = await file.read() if file else sample['path'].read_bytes()
+        if file:
+            chunks, size = [], 0
+            while chunk := await file.read(1024 * 1024):
+                size += len(chunk)
+                if size > MAX_UPLOAD_BYTES:
+                    return error_response('TOO_LARGE', 'The upload exceeds 25 MB.', 'Upload a smaller bacterial genome.', 413)
+                chunks.append(chunk)
+            data = b''.join(chunks)
+        else:
+            if sample['path'].stat().st_size > MAX_UPLOAD_BYTES:
+                return error_response('TOO_LARGE', 'The sample exceeds 25 MB.', status=413)
+            data = sample['path'].read_bytes()
         parse_and_qc(data)
     except InputError as exc:
-        return error_response(exc.code, exc.message, exc.hint)
+        return error_response(exc.code, exc.message, exc.hint, 413 if exc.code == 'TOO_LARGE' else 400)
     except OSError:
         return error_response('UNKNOWN_SAMPLE', 'This sample could not be read.')
     label = file.filename if file else sample['label']
@@ -48,3 +61,8 @@ async def post_job(file: UploadFile | None = File(None), sample_id: str | None =
 def job_status(job_id: str):
     job = get_job(job_id)
     return job if job else error_response('JOB_NOT_FOUND', 'This analysis no longer exists.', 'Start a new analysis.', 404)
+
+
+@app.exception_handler(RequestValidationError)
+async def invalid_request(request, exc):
+    return error_response('NO_INPUT', 'The request contains an invalid file or form field.', 'Choose a FASTA file or a sample.')
