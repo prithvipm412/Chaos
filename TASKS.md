@@ -251,7 +251,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Depends on: T19
   Done when: build passes and the flow looks smooth in mock and real mode.
 
-- [ ] T26 [CORE] Recent jobs endpoint + README
+- [x] T26 [CORE] Recent jobs endpoint + README
   Files: backend/main.py, backend/jobs.py, README.md
   Do: GET /api/jobs?limit=10 → [{job_id,status,created_at,label}] newest first. README: setup (brew blast, setup_data.sh,
   get_samples.sh, make_demo_inputs.sh, precompute.py) and run commands for both lanes.
