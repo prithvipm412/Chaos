@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { listSamples, createJob, ApiError } from '../api';
+import { listSamples, listJobs, createJob, ApiError } from '../api';
 import ErrorPanel from './ErrorPanel';
 
 const ALLOWED_EXTENSIONS = ['.fa', '.fasta', '.fna', '.gz'];
@@ -32,6 +32,7 @@ function getSimulateParam() {
 
 export default function UploadScreen() {
   const [samples, setSamples] = useState([]);
+  const [recentJobs, setRecentJobs] = useState([]);
   const [loadingSamples, setLoadingSamples] = useState(true);
   const [samplesError, setSamplesError] = useState(null);
 
@@ -61,6 +62,13 @@ export default function UploadScreen() {
       }
     }
     fetchSamples();
+    listJobs(5)
+      .then((jobs) => {
+        if (active) setRecentJobs(Array.isArray(jobs) ? jobs.slice(0, 5) : []);
+      })
+      .catch(() => {
+        if (active) setRecentJobs([]);
+      });
     return () => {
       active = false;
     };
@@ -365,6 +373,36 @@ export default function UploadScreen() {
           </div>
         )}
       </section>
+
+      {recentJobs.length > 0 && (
+        <section className="space-y-4" aria-labelledby="recent-analyses-heading">
+          <h2 id="recent-analyses-heading" className="text-lg font-semibold text-text tracking-tight">Recent analyses</h2>
+          <ul className="rounded-xl border border-border bg-white divide-y divide-border">
+            {recentJobs.map((job) => {
+              const date = new Date(job.created_at);
+              const statusClass = job.status === 'failed'
+                ? 'bg-fail-bg text-fail border-fail-border'
+                : job.status === 'done'
+                ? 'bg-noknown-bg text-noknown border-noknown-border'
+                : 'bg-uncertain-bg text-uncertain border-uncertain-border';
+              return (
+                <li key={job.job_id}>
+                  <a
+                    href={`#/job/${encodeURIComponent(job.job_id)}`}
+                    className="flex flex-wrap items-center gap-3 p-4 rounded-xl hover:bg-bg-surface focus-visible:outline-accent"
+                  >
+                    <span className="flex-1 min-w-0 text-sm font-medium text-text break-words">{job.label}</span>
+                    <span className={`text-xs px-2 py-0.5 rounded-full border capitalize ${statusClass}`}>{job.status}</span>
+                    {!Number.isNaN(date.getTime()) && (
+                      <time dateTime={job.created_at} className="text-xs text-text-secondary">{date.toLocaleString()}</time>
+                    )}
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
     </div>
   );
 }
