@@ -4,6 +4,9 @@ export default function SummaryBar({ summary, calls = [] }) {
   if (!summary) return null;
 
   const { fail = 0, uncertain = 0, no_known = 0, headline = '', options = [] } = summary;
+  const urinaryOnlyOptions = options.length > 0 && options.every((option) =>
+    calls.find((call) => call.antibiotic === option)?.tags?.includes('urinary_tract_only')
+  );
 
   return (
     <section className="rounded-2xl border border-border bg-white p-6 sm:p-7 shadow-xs space-y-5">
@@ -52,6 +55,11 @@ export default function SummaryBar({ summary, calls = [] }) {
           </div>
         ) : (
           <span className="text-text-secondary italic">None identified in tested panel</span>
+        )}
+        {urinaryOnlyOptions && (
+          <p className="w-full text-uncertain font-semibold" role="status">
+            No systemic options with no known resistance — consult microbiology / infectious diseases.
+          </p>
         )}
       </div>
     </section>
