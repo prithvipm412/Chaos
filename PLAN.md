@@ -8,7 +8,7 @@ assembled genome in about 1–2 minutes and show which antibiotics are likely to
 ## 90-second demo story
 1. Pick sample "K. pneumoniae (ICU blood culture)". Pipeline steps light up: QC → genes → BLAST → predict.
 2. Antibiogram grid: carbapenems + all beta-lactams LIKELY TO FAIL (red). Headline: "Carbapenem-resistant".
-   Click Meropenem → evidence drawer: KPC-2, 100% identity, 100% coverage, contig 12, 4512–5393.
+   Click Meropenem → evidence drawer: KPC-3, 100% identity, 100% coverage, plasmid CP008830.1:15984–16865.
 3. The E. coli K-12 reference has chromosomal ampC/efflux hits, and we still don't flag it red, because
    intrinsic genes are deliberately not used for calls. Shows the engine is engineered, not a lookup.
 4. Failure demos: (a) upload a protein FASTA → "This is a protein file, upload the assembled DNA genome".
@@ -20,7 +20,7 @@ assembled genome in about 1–2 minutes and show which antibiotics are likely to
 React (Vite, Tailwind) ──poll──> FastAPI ──> one worker thread ──> pipeline:
 `qc.parse_and_qc` → `genes.call_genes` (pyrodigal) → `blast.run_blastp` (CARD protein homolog DB)
 → `predict.predict` (our rules engine) → result. Job state = JSON files on disk (survives refresh and
-restart). Results are cached by input sha256, so samples run instantly. No LLM. No chat.
+restart). The spike measured ~30–40 s per genome. Results are cached by input sha256, so samples run instantly. No LLM. No chat.
 
 ## Lanes, folders, git (ONE Mac)
 - [CORE] Codex in `~/chaos` owns: `backend/**`, `scripts/**`, `demo_inputs/**`, `data/` (gitignored).
@@ -53,22 +53,22 @@ frontend/src/api.js  frontend/src/mock/*.json  frontend/src/hooks/  frontend/src
 ## Job JSON (exact; UI mocks must match)
 ```json
 {"job_id":"j_8f3a2c","status":"done","created_at":"2026-10-15T14:02:11Z","label":"K. pneumoniae (ICU blood culture)",
- "steps":[{"id":"qc","label":"Genome QC","status":"done","elapsed_s":0.4,"detail":"112 contigs, 5.41 Mb"},
+ "steps":[{"id":"qc","label":"Genome QC","status":"done","elapsed_s":0.4,"detail":"4 contigs, 5.77 Mb"},
           {"id":"genes","label":"Gene calling","status":"done","elapsed_s":9.8,"detail":"5,123 genes"},
           {"id":"blast","label":"Resistance gene search","status":"done","elapsed_s":41.2,"detail":"38 hits"},
           {"id":"predict","label":"Antibiotic prediction","status":"done","elapsed_s":0.1,"detail":"16 antibiotics"}],
  "progress":1.0, "cached":false, "error":null,
  "result":{
-  "qc":{"total_length":5412345,"n_contigs":112,"n50":145000,"longest_contig":410000,"gc_percent":57.2,
+  "qc":{"total_length":5766615,"n_contigs":4,"n50":5394056,"longest_contig":5394056,"gc_percent":57.2,
         "n_percent":0.01,"grade":"good","warnings":[]},
   "genes_called":5123,
-  "contigs":[{"id":"contig_12","length":180200}],
-  "hits":[{"hit_id":"h1","gene":"KPC-2","aro":"ARO:3002312","family":"KPC beta-lactamase",
+  "contigs":[{"id":"CP008830.1","length":113105}],
+  "hits":[{"hit_id":"h1","gene":"KPC-3","aro":"ARO:3002312","family":"KPC beta-lactamase",
            "drug_classes":["carbapenem","cephalosporin","penam"],"mechanism":"antibiotic inactivation",
-           "identity":100.0,"coverage":100.0,"tier":"exact","contig":"contig_12","start":4512,"end":5393,
+           "identity":100.0,"coverage":100.0,"tier":"exact","contig":"CP008830.1","start":15984,"end":16865,
            "strand":"+","used_for_calls":true,"rule":"carbapenemase"}],
   "calls":[{"antibiotic":"Meropenem","group":"Carbapenems","status":"FAIL","confidence":"high",
-            "evidence":["h1"],"reason":"KPC-2 carbapenemase (100% id, 100% cov)"}],
+            "evidence":["h1"],"reason":"KPC-3 carbapenemase (100% id, 100% cov)"}],
   "summary":{"fail":9,"uncertain":2,"no_known":5,"headline":"Carbapenem-resistant (KPC) — avoid carbapenems",
              "options":["Amikacin","Colistin","Tigecycline"]},
   "disclaimer":"Decision support only — confirm with lab AST. Absence of known genes does not prove susceptibility."}}
@@ -81,8 +81,8 @@ frontend/src/api.js  frontend/src/mock/*.json  frontend/src/hooks/  frontend/src
 - `contigs` = 30 longest + any contig with a hit. `result` is null until done.
 
 ## Engineered core — `predict.predict(hits, qc) -> dict(calls, summary)` + `rules.py`
-1. **Best hit per ORF** (highest bitscore). Coverage = aligned length / CARD ref length.
-   Tier: exact (id≥98 & cov≥90), strict (id≥80 & cov≥80), partial (id≥50 & cov≥60), else drop.
+1. **Best hit per ORF** (highest bitscore). Coverage = min(query cov, ref cov), as in the spike.
+   Tier: exact (id≥98 & cov≥90), strict (id≥80 & cov≥80), partial (id≥50 & cov≥50), else drop.
 2. **Rule table** (`rules.RULES`, matched on CARD gene name/family, first match wins) → effect per antibiotic:
    carbapenemase (KPC, NDM, VIM, IMP, OXA-48/181/232/244) → FAIL all 8 beta-lactams ·
    ESBL (CTX-M, PER, VEB, SHV/TEM ESBL alleles) → FAIL Ampicillin, Ceftriaxone, Ceftazidime, Cefepime; UNCERTAIN Amox-clav, Pip-tazo ·

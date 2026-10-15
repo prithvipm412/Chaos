@@ -11,11 +11,11 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Files: backend/main.py, backend/jobs.py, backend/config.py, backend/requirements.txt
   Do: Add python-multipart, httpx, pytest, pyrodigal, biopython to requirements.txt and install them in backend/.venv.
   config.py: DATA_DIR (env DATA_DIR, default <repo>/data), CARD_DIR, SAMPLES_DIR, JOBS_DIR, CACHE_DIR,
-  BLAST_DB (use the DB path the spike reported in HANDOFF.md), MAX_UPLOAD_BYTES=25 MB, BLAST_TIMEOUT_S=300, BLAST_THREADS=6.
+  BLAST_DB = DATA_DIR/card/card_proteins (built by scripts/setup_data.sh), MAX_UPLOAD_BYTES=25 MB, BLAST_TIMEOUT_S=300, BLAST_THREADS=6.
   jobs.py: `create_job(fasta_bytes: bytes|None, sample_id: str|None, label: str, simulate: str|None) -> str`,
   `get_job(job_id) -> dict|None`. Job saved at JOBS_DIR/<id>/job.json, written atomically (tmp file + os.replace).
   One daemon worker thread pulls from a queue.Queue. The FAKE runner walks the 4 steps (2 s each), then sets a result:
-  a hardcoded dict matching the PLAN.md Job JSON (1 KPC-2 hit, 3 calls).
+  a hardcoded dict matching the PLAN.md Job JSON (1 KPC-3 hit, 3 calls).
   main.py: routes POST /api/jobs, GET /api/jobs/{id}, GET /api/samples (static list of the 4 ids in PLAN.md, inline for now).
   CORS allows GET+POST from http://localhost:5173 and http://127.0.0.1:5173. Errors use the PLAN.md error shape.
   Interface: PLAN.md "HTTP interface" + "Job JSON". Job ids look like `j_` + 6 hex chars.
@@ -26,7 +26,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
 - [ ] T02 [UI] API client + mock fixtures
   Files: frontend/src/api.js, frontend/src/mock/samples.json, frontend/src/mock/job_done.json, frontend/src/mock/job_failed.json
   Do: job_done.json = the full PLAN.md Job JSON, extended to all 16 antibiotics (9 FAIL, 2 UNCERTAIN, 5 NO_KNOWN), 4 hits
-  (KPC-2 exact, TEM-1 exact, aac(6')-Ib-cr strict, acrB used_for_calls:false) and 5 contigs. job_failed.json = failed at
+  (KPC-3 exact, TEM-1 exact, aac(6')-Ib-cr strict, acrB used_for_calls:false) and 5 contigs. job_failed.json = failed at
   the blast step, error BLAST_TIMEOUT retryable:true, result null. samples.json = the 4 PLAN.md samples.
   api.js exports: `listSamples()`, `createJob({file, sampleId, simulate})`, `getJob(id)`, `retryJob(id)`, `listJobs(limit)`,
   `class ApiError {status, code, message, hint}`. API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8000'.
@@ -81,9 +81,8 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Do: Move the working logic from backend/pipeline_spike.py (leave the spike file as is).
   `call_genes(contigs) -> list[dict]` with {orf_id, contig, start, end, strand, protein}, using pyrodigal meta mode
   (`GeneFinder(meta=True)`). `run_blastp(orfs, db_path, timeout_s, threads) -> list[dict]` writes the query FASTA to a temp dir and
-  runs blastp with `-outfmt "6 qseqid sseqid pident length qlen slen evalue bitscore"`, `-evalue 1e-10`,
-  `-max_target_seqs 5`, `subprocess.run(..., timeout=timeout_s)`. Returns {orf_id, sseqid, aro, ref_name, identity,
-  coverage = length/slen*100, bitscore}. Raise `BlastError(code, message)` with BLAST_TIMEOUT or BLAST_FAILED.
+  runs the spike's exact blastp command/outfmt via `subprocess.run(..., timeout=timeout_s)`. Returns ALL hits with id≥50 and cov≥50
+  as {orf_id, aro, ref_name, identity, coverage, bitscore}, where coverage = min(query cov, ref cov) as in the spike (best-per-ORF is done in T15). Raise `BlastError(code, message)` with BLAST_TIMEOUT or BLAST_FAILED.
   Depends on: setup spike (HANDOFF.md)
   Done when: test parses a 3-line canned outfmt-6 string (put the parser in `parse_outfmt6(text)`), and a quick manual run on
   eco_k12 returns >0 hits (record the timing in HANDOFF).
@@ -94,7 +93,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   then one card per evidence hit_id (gene, family, identity %, coverage % as small bars, tier badge, contig:start–end,
   strand, mechanism). For NO_KNOWN: "No known resistance genes for this drug were found in this genome," plus the reason.
   Depends on: T06
-  Done when: clicking Meropenem in mock mode shows the KPC-2 evidence card.
+  Done when: clicking Meropenem in mock mode shows the KPC-3 evidence card.
 
 - [ ] T09 [CORE] CARD index + panel + prediction v0
   Files: backend/card.py, backend/rules.py, backend/predict.py, backend/tests/test_predict.py
@@ -105,12 +104,12 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   drug_classes cover the drug → FAIL. A partial hit → UNCERTAIN. Otherwise NO_KNOWN. Apply the QC guard. Calls/summary use the exact
   PLAN.md shape and include the disclaimer. (T15 replaces the logic and keeps the signature.)
   Depends on: T07
-  Done when: test with a fake KPC-2 hit gives Meropenem FAIL; an empty hit list with poor QC gives no NO_KNOWN at all.
+  Done when: test with a fake KPC-3 hit gives Meropenem FAIL; an empty hit list with poor QC gives no NO_KNOWN at all.
 
 - [ ] T10 [CORE] Wire the real pipeline into the worker + sample registry
   Files: backend/jobs.py, backend/samples.py, backend/main.py
-  Do: samples.py: `SAMPLES = [{id, label, organism, note, path}]` for the 4 ids (paths from the spike's data/samples;
-  kpn_kpc_partial may be missing until T23, so list only the files that exist). /api/samples returns them without the path.
+  Do: samples.py: `SAMPLES = [{id, label, organism, note, path}]` for the 4 ids (paths: kpn_kpc→data/samples/kp_kpc.fasta,
+  eco_ctxm→ecoli_ctxm.fasta, eco_k12→ecoli_k12.fasta; kpn_kpc_partial→kpn_kpc_partial.fasta from T23. List only files that exist). /api/samples returns them without the path.
   The worker replaces the fake runner: qc → genes → blast → annotate hits with card index + tier + contig coords
   (hit_id h1..hN; used_for_calls default true) → predict → result (contigs = 30 longest + any with a hit).
   Each step sets running/done, elapsed_s and detail strings like PLAN.md. Exceptions → status failed with an error code
@@ -142,7 +141,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   in PLAN.md "Rule table". Also add `INTRINSIC` (efflux / permeability / regulator mechanisms; EC-* and chromosomal ampC names) and
   `match_rule(gene, family, mechanism) -> rule|"intrinsic"|None`. Keep PANEL.
   Depends on: T09
-  Done when: tests cover KPC-2→carbapenemase, NDM-1, OXA-48, OXA-1→narrow, CTX-M-15→ESBL, TEM-1→narrow, SHV-12→ESBL,
+  Done when: tests cover KPC-3→carbapenemase, NDM-1, OXA-48, OXA-1→narrow, CTX-M-15→ESBL, TEM-1→narrow, SHV-12→ESBL,
   SHV-1→narrow, CMY-2→AmpC, armA, mcr-1, acrB→intrinsic, EC-5→intrinsic.
 
 - [ ] T14 [UI] Contig map
@@ -165,7 +164,8 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
 
 - [ ] T16 [CORE] Validate on the 3 real samples
   Files: scripts/run_samples.py, backend/rules.py
-  Do: The script runs the pipeline functions directly (no server) on each sample and prints a table of antibiotic × status,
+  Do: Known real markers (spike): kp_kpc KPC-3, SHV-11, TEM-1, FosA6, oqxAB, sul1, dfrA12;
+  eco_ctxm CTX-M-15, CMY-23, OXA-1, TEM-1, sul1, tet(A); eco_k12 ampC + efflux only. The script runs the pipeline functions directly (no server) on each sample and prints a table of antibiotic × status,
   plus the hits used and ignored. Tune the RULES/INTRINSIC regexes only, until: kpn_kpc → Meropenem FAIL; eco_ctxm → Ceftriaxone FAIL
   and Meropenem not FAIL; eco_k12 → no FAIL at all (except Ampicillin if a real acquired bla is present, which you must explain).
   Depends on: T15
@@ -225,8 +225,8 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
 
 - [ ] T23 [CORE] Demo inputs: partial genome + bad files
   Files: scripts/make_demo_inputs.sh, demo_inputs/README.md, backend/samples.py
-  Do: The script writes data/samples/kpn_kpc_partial.fasta (the first contigs of the KPC genome until about 1.2 Mb, so the KPC contig is
-  excluded if possible) and small committed files in demo_inputs/: protein.fasta (3 CARD proteins), empty.fasta, notes.txt
+  Do: The script writes data/samples/kpn_kpc_partial.fasta: chop the kp_kpc chromosome (the longest contig) into 20 kb pieces and
+  keep the first 60 (1.2 Mb), with no plasmids, so KPC-3 is gone. This is the "never a false safe" demo and small committed files in demo_inputs/: protein.fasta (3 CARD proteins), empty.fasta, notes.txt
   (plain text), header_only.fasta, genome_small.fasta.gz (gzip of 20 kb DNA). Register kpn_kpc_partial with
   label "K. pneumoniae — incomplete assembly (demo)". The README lists the expected error per file.
   Depends on: T18
