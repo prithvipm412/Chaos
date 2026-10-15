@@ -120,4 +120,5 @@ T21 done: added fading token-based connection banner and running-job resume link
 
 F3 done: poor/fair genomes without FAIL now show uncertainty headlines, while real FAIL retains its mechanism headline; 54 tests pass and all four sample caches regenerated. Added backend/jobs.py to card for required cache version bump v1-qc-headline-4; partial cache headline is now "Incomplete genome — results uncertain". T27 waits for T19/T25 to merge.
 T14 done: SVG ContigMap with scaled contig bars, hit markers coloured by tier (exact=blue solid, strict=purple outline, partial=amber dashed), grey intrinsic markers, hover tooltip with gene/coords, click opens EvidenceDrawer via call lookup.
+T17 done: collapsible GenesTable with "Used for predictions" and "Intrinsic — informational" sections, identity/coverage mini-bars, tier badges, rule column; acrB appears in intrinsic section.
 

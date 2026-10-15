@@ -218,7 +218,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Depends on: T15
   Done when: `backend/.venv/bin/python scripts/run_samples.py` meets those 3 checks. Paste the 3 headlines into HANDOFF.
 
-- [ ] T17 [UI] "All genes detected" table
+- [x] T17 [UI] "All genes detected" table
   Files: frontend/src/components/GenesTable.jsx, frontend/src/components/JobScreen.jsx
   Do: A collapsible table of all hits: gene, family, identity, coverage, tier, contig, rule. Two sections:
   "Used for predictions" and "Intrinsic — informational (efflux/chromosomal genes found in normal strains; not used for predictions)". This makes the

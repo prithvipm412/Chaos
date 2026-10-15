@@ -7,6 +7,7 @@ import EvidenceDrawer from './EvidenceDrawer';
 import QcPanel from './QcPanel';
 import ConnectionBanner from './ConnectionBanner';
 import ContigMap from './ContigMap';
+import GenesTable from './GenesTable';
 
 
 export default function JobScreen({ jobId }) {
@@ -134,6 +135,9 @@ export default function JobScreen({ jobId }) {
                 calls={job.result.calls || []}
                 onSelectCall={(call) => setSelectedCall(call)}
               />
+
+              {/* All genes detected table */}
+              <GenesTable hits={job.result.hits || []} />
 
               <AntibiogramGrid
                 calls={job.result.calls}
