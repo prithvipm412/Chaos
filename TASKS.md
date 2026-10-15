@@ -193,7 +193,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Depends on: T16, T22, the predict.py headline fix (commit after e47bab5)
   Done when: `backend/.venv/bin/python -m pytest backend/tests -q` passes (new test included).
 
-- [ ] T29 [CORE] "Remaining options" ranked narrowest-spectrum-first
+- [x] T29 [CORE] "Remaining options" ranked narrowest-spectrum-first
   Files: backend/rules.py, backend/predict.py, backend/tests/test_predict.py, backend/jobs.py
   Note: Cache version bump required so cached API results expose the ranked options and options_note.
   Do: rules.py: add `SPECTRUM_RANK: dict[str,int]` over all 16 PANEL antibiotics, narrowest/first-line = 0, reserve/
