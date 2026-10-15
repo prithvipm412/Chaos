@@ -57,7 +57,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Done when: ?mock flow shows the steps advancing, then done. Refresh mid-run keeps the same job on screen.
 
 ## M1 — Happy path on real genomes (target 14:50)
-- [ ] T05 [CORE] FASTA parsing + genome QC
+- [x] T05 [CORE] FASTA parsing + genome QC
   Files: backend/qc.py, backend/tests/test_qc.py
   Do: `class InputError(Exception): code, message, hint`. `parse_and_qc(data: bytes) -> tuple[list[tuple[str,str]], dict]`
   returns (contigs [(id, seq)], qc dict). The qc dict has exactly the PLAN.md result.qc keys. Grade rules and warnings follow PLAN.md.

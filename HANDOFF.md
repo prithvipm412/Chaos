@@ -31,3 +31,4 @@
 - Sources: CARD automatic downloads `https://card.mcmaster.ca/latest/data`; KPNIH1 project `https://www.ncbi.nlm.nih.gov/bioproject/PRJNA73191`; EC958 reference paper `https://pmc.ncbi.nlm.nih.gov/articles/PMC4134206/`. Next: lead can plan around verified target markers and ~40s real pipeline runs; cached results remain local under ignored data/.
 
 T01 done: persistent atomic JSON job API, one daemon queue worker, fake four-step result, sample list and CORS; TestClient roundtrip passes in 8.38s (1 test).
+T05 done: FASTA validation, DNA/protein detection, N50/GC/N-content and quality guards; 9 QC tests pass. Invalid DNA characters below the protein threshold receive NOT_FASTA.
