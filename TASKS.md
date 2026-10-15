@@ -26,7 +26,8 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   suite passes, then `backend/.venv/bin/python scripts/precompute.py` to refresh caches (bump RULES_VERSION first).
 
 - [ ] F5 [CORE] Tag urinary-only antibiotics; don't let them rank first
-  Files: backend/rules.py, backend/predict.py, backend/tests/test_predict.py
+  Files: backend/rules.py, backend/predict.py, backend/tests/test_predict.py, backend/jobs.py
+  Note: jobs.py added for required cache invalidation so cached calls include tags and updated ordering. PLAN.md already includes calls[].tags.
   Do: Bug (user testing) — Nitrofurantoin and Fosfomycin only treat urinary infections, but the narrowest-spectrum
   sort (T29) puts them at the top of `summary.options` for ANY infection, including bloodstream/systemic ones.
   rules.py: add `URINARY_ONLY = {'Nitrofurantoin', 'Fosfomycin'}` next to SPECTRUM_RANK. predict.py: when building

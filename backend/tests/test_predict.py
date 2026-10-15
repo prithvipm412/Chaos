@@ -99,15 +99,15 @@ def test_origin_contract_and_real_k12():
 
 
 def test_remaining_options_rank_and_note():
-    from backend.rules import PANEL, SPECTRUM_RANK
+    from backend.rules import PANEL, SPECTRUM_RANK, URINARY_ONLY
     from backend.predict import MUTATION_DRIVEN
 
     # K-12-shaped input: normal intrinsic homologs must not remove options.
     result = predict([hit('ampC'), hit('acrB', mechanism='antibiotic efflux')], {'grade': 'good'})
     summary = result['summary']
     assert set(SPECTRUM_RANK) == {drug['antibiotic'] for drug in PANEL}
-    assert summary['options'] == sorted(set(SPECTRUM_RANK) - MUTATION_DRIVEN, key=SPECTRUM_RANK.__getitem__)
-    assert summary['options'][0] == 'Nitrofurantoin'
+    assert summary['options'] == sorted(set(SPECTRUM_RANK) - MUTATION_DRIVEN, key=lambda a: (a in URINARY_ONLY, SPECTRUM_RANK[a]))
+    assert summary['options'][0] == 'Ampicillin'
     assert summary['options_note'] == (
         'Narrowest-spectrum options with no known resistance found, listed first-line to last-resort. '
         'Decision support only — confirm with lab AST.'
@@ -178,3 +178,20 @@ def test_real_kpn_mutation_driven_options():
     by_name = {call['antibiotic']: call for call in prediction['calls']}
     assert all(by_name[name]['status'] == 'UNCERTAIN' for name in MUTATION_DRIVEN)
     assert not MUTATION_DRIVEN.intersection(prediction['summary']['options'])
+
+
+def test_urinary_tags_and_options_order():
+    from backend.rules import URINARY_ONLY
+
+    for grade in ('good', 'fair', 'poor'):
+        prediction = predict([hit('ampC'), hit('acrB', mechanism='antibiotic efflux')], {'grade': grade})
+        for call in prediction['calls']:
+            assert call['tags'] == (['urinary_tract_only'] if call['antibiotic'] in URINARY_ONLY else [])
+        options = prediction['summary']['options']
+        if options:
+            assert options[0] not in URINARY_ONLY
+            assert options[-2:] == ['Nitrofurantoin', 'Fosfomycin']
+    # Tags identify restrictions even when resistance evidence excludes the drug from options.
+    resistant = calls([hit('fosA3')])['Fosfomycin']
+    assert resistant['status'] == 'FAIL'
+    assert resistant['tags'] == ['urinary_tract_only']

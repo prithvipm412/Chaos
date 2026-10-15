@@ -12,6 +12,8 @@ PANEL = [dict(antibiotic=name, group=group, classes=classes) for name, group, cl
     ('Nitrofurantoin', 'Other', ['nitrofuran']), ('Fosfomycin', 'Other', ['fosfomycin']),
     ('Colistin', 'Other', ['polymyxin', 'peptide']), ('Tigecycline', 'Other', ['glycylcycline', 'tetracycline'])]]
 
+URINARY_ONLY = {'Nitrofurantoin', 'Fosfomycin'}
+
 SPECTRUM_RANK = {name: rank for rank, name in enumerate([
     'Nitrofurantoin', 'Fosfomycin', 'Ampicillin', 'Co-trimoxazole',
     'Amoxicillin-clavulanate', 'Gentamicin', 'Ciprofloxacin', 'Amikacin',

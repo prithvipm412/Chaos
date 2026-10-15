@@ -1,6 +1,6 @@
 """Conservative marker rules: homolog presence alone never proves susceptibility."""
 import re
-from backend.rules import PANEL, SPECTRUM_RANK, classify
+from backend.rules import PANEL, SPECTRUM_RANK, URINARY_ONLY, classify
 
 MUTATION_DRIVEN = {'Ciprofloxacin', 'Colistin', 'Tigecycline'}
 
@@ -64,7 +64,8 @@ def predict(hits: list[dict], qc: dict) -> dict:
         if not evidence and drug['antibiotic'] in ('Ciprofloxacin', 'Nitrofurantoin'):
             reason += ' Point mutations not assessed.'
         calls.append(dict(antibiotic=drug['antibiotic'], group=drug['group'], status=status, confidence=confidence,
-                          evidence=[h['hit_id'] for h in evidence], reason=reason))
+                          evidence=[h['hit_id'] for h in evidence], reason=reason,
+                          tags=['urinary_tract_only'] if drug['antibiotic'] in URINARY_ONLY else []))
     headline = 'No major acquired resistance found'
     if not any(c['status'] == 'FAIL' for c in calls):
         if qc['grade'] == 'poor':
@@ -83,6 +84,6 @@ def predict(hits: list[dict], qc: dict) -> dict:
             break
     summary = dict(fail=sum(c['status'] == 'FAIL' for c in calls), uncertain=sum(c['status'] == 'UNCERTAIN' for c in calls),
                    no_known=sum(c['status'] == 'NO_KNOWN' for c in calls), headline=headline,
-                   options=sorted([c['antibiotic'] for c in calls if c['status'] == 'NO_KNOWN'], key=SPECTRUM_RANK.__getitem__),
+                   options=sorted([c['antibiotic'] for c in calls if c['status'] == 'NO_KNOWN'], key=lambda a: (a in URINARY_ONLY, SPECTRUM_RANK[a])),
                    options_note='Narrowest-spectrum options with no known resistance found, listed first-line to last-resort. Decision support only — confirm with lab AST.')
     return dict(calls=calls, summary=summary, disclaimer=DISCLAIMER)
