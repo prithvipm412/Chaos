@@ -37,7 +37,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Depends on: none (mocks)
   Done when: build passes and `grep -c '"antibiotic"' frontend/src/mock/job_done.json` prints 16.
 
-- [ ] T03 [UI] App shell, hash routing, upload screen
+- [x] T03 [UI] App shell, hash routing, upload screen
   Files: frontend/src/App.jsx, frontend/src/components/UploadScreen.jsx
   Do: Hash router: `#/` → UploadScreen, `#/job/<id>` → placeholder "Job <id>" (T04 replaces it). Header "Genome Firewall"
   + subtitle "Antibiotic resistance from a bacterial genome, in minutes". UploadScreen: drag-and-drop zone + file
