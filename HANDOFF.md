@@ -181,3 +181,5 @@ T24 done: Print report action and print-only ReportHeader include sample/job/dat
 F7 done: SummaryBar warns below chips when all remaining options carry urinary_tract_only; real KPC result shows warning and K-12 does not. Build and rendered-component checks against live API results pass; empty, missing-tag and mixed-option cases retain prior behavior.
 
 F7 print follow-up done: ReportHeader includes the same systemic-options warning when every remaining option is urinary-only; build passes and Chrome print-media checks using real KPC/K-12 results confirm warning visible only for KPC, with all 16 prediction rows retained.
+
+F8 done: colistin_mcr headline ranks after carbapenemase/ESBL; any other FAIL mechanism falls back to Resistance detected (<top gene>). RULES_VERSION v1-headline-8, all four caches rebuilt, 59 backend tests pass; saved real MCR-1.1 result now says Colistin-resistant (MCR-1.1), NDM-1 priority preserved. Pre-existing lockfile edits preserved.

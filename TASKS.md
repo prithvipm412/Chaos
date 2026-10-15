@@ -7,6 +7,13 @@ CORE checks run from `~/chaos`. UI checks run from `~/chaos-ui`. UI build check 
 UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
 
 ## FIX — lead puts urgent fixes here (do these first)
+- [x] F8 [CORE] Include non-beta-lactam FAIL calls in summary headlines
+  Files: backend/predict.py, backend/jobs.py, backend/tests/test_predict.py
+  Do: Approved past 16:15 cutoff by user. Rank colistin_mcr after carbapenemase and ESBL;
+  use "Colistin-resistant (<gene>)" and fall back to "Resistance detected (<top gene>)" for other FAIL mechanisms.
+  Bump RULES_VERSION and recompute all four sample caches with scripts/precompute.py.
+  Done when: mcr-only and generic fallback regressions pass; full backend suite passes (59 tests), four caches rebuilt.
+
 - [x] F7 [UI] Warn when every remaining option is urinary-only
   Files: frontend/src/components/SummaryBar.jsx, frontend/src/components/ReportHeader.jsx
   Note: User-requested follow-up also includes the same conditional warning in the print-only report.
