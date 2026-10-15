@@ -2,6 +2,8 @@
 import re
 from backend.rules import PANEL, SPECTRUM_RANK, classify
 
+MUTATION_DRIVEN = {'Ciprofloxacin', 'Colistin', 'Tigecycline'}
+
 DISCLAIMER = 'Decision support only — confirm with lab AST. Absence of known genes does not prove susceptibility.'
 
 
@@ -55,6 +57,8 @@ def predict(hits: list[dict], qc: dict) -> dict:
         reason = '; '.join(f"{h['gene']} ({h['identity']:g}% id, {h['coverage']:g}% cov)" for h in evidence) or 'No known resistance gene found.'
         if status == 'UNCERTAIN' and evidence:
             reason += ' Evidence is incomplete or insufficient for a failure prediction.'
+        if status == 'NO_KNOWN' and drug['antibiotic'] in MUTATION_DRIVEN:
+            status, confidence, reason = 'UNCERTAIN', 'low', 'Resistance often from mutations not assessed.'
         if status == 'NO_KNOWN' and qc['grade'] == 'poor':
             status, confidence, reason = 'UNCERTAIN', 'low', 'Genome incomplete — cannot rule out resistance.'
         if not evidence and drug['antibiotic'] in ('Ciprofloxacin', 'Nitrofurantoin'):

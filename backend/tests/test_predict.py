@@ -35,7 +35,9 @@ def test_ctxm():
 
 def test_intrinsic():
     h = hit('acrB', mechanism='antibiotic efflux')
-    assert all(c['status']=='NO_KNOWN' for c in calls([h]).values())
+    from backend.predict import MUTATION_DRIVEN
+    assert all(c['status'] == ('UNCERTAIN' if name in MUTATION_DRIVEN else 'NO_KNOWN')
+               for name, c in calls([h]).items())
     assert not h['used_for_calls'] and h['rule']=='intrinsic'
 
 
@@ -98,12 +100,13 @@ def test_origin_contract_and_real_k12():
 
 def test_remaining_options_rank_and_note():
     from backend.rules import PANEL, SPECTRUM_RANK
+    from backend.predict import MUTATION_DRIVEN
 
     # K-12-shaped input: normal intrinsic homologs must not remove options.
     result = predict([hit('ampC'), hit('acrB', mechanism='antibiotic efflux')], {'grade': 'good'})
     summary = result['summary']
     assert set(SPECTRUM_RANK) == {drug['antibiotic'] for drug in PANEL}
-    assert summary['options'] == sorted(SPECTRUM_RANK, key=SPECTRUM_RANK.__getitem__)
+    assert summary['options'] == sorted(set(SPECTRUM_RANK) - MUTATION_DRIVEN, key=SPECTRUM_RANK.__getitem__)
     assert summary['options'][0] == 'Nitrofurantoin'
     assert summary['options_note'] == (
         'Narrowest-spectrum options with no known resistance found, listed first-line to last-resort. '
@@ -139,3 +142,39 @@ def test_real_partial_genome_headline():
     assert all(call['status'] == 'UNCERTAIN' for call in prediction['calls'])
     assert 'Incomplete genome' in prediction['summary']['headline']
     assert 'No major acquired resistance found' not in prediction['summary']['headline']
+
+
+def test_mutation_guard_preserves_gene_evidence_and_nitrofurantoin():
+    from backend.predict import MUTATION_DRIVEN
+
+    for grade in ('good', 'fair', 'poor'):
+        result = calls([], grade)
+        for name in MUTATION_DRIVEN:
+            assert result[name]['status'] == 'UNCERTAIN'
+            assert result[name]['confidence'] == 'low'
+            assert result[name]['reason'].startswith('Resistance often from mutations not assessed.')
+    for gene, drug, status in [('qnrS1', 'Ciprofloxacin', 'UNCERTAIN'),
+                               ("aac(6')-Ib-cr", 'Ciprofloxacin', 'UNCERTAIN'),
+                               ('mcr-1', 'Colistin', 'FAIL'), ('tet(X)', 'Tigecycline', 'FAIL')]:
+        call = calls([hit(gene)])[drug]
+        assert call['status'] == status
+        assert call['evidence'] == [gene]
+        assert gene in call['reason']
+    nitro = calls([])['Nitrofurantoin']
+    assert nitro['status'] == 'NO_KNOWN'
+    assert 'Point mutations not assessed.' in nitro['reason']
+
+
+def test_real_kpn_mutation_driven_options():
+    from backend.jobs import execute_pipeline, read_cache
+    from backend.samples import available_samples
+    from backend.predict import MUTATION_DRIVEN
+
+    sample = next(s for s in available_samples() if s['id'] == 'kpn_kpc')
+    data = sample['path'].read_bytes()
+    cached = read_cache(data)
+    result = cached['result'] if cached else execute_pipeline(data, lambda *args: None)
+    prediction = predict(result['hits'], result['qc'])
+    by_name = {call['antibiotic']: call for call in prediction['calls']}
+    assert all(by_name[name]['status'] == 'UNCERTAIN' for name in MUTATION_DRIVEN)
+    assert not MUTATION_DRIVEN.intersection(prediction['summary']['options'])
