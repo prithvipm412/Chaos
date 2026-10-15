@@ -47,7 +47,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Depends on: T02
   Done when: http://localhost:5173/?mock#/ shows the samples; clicking one routes to #/job/j_mock01.
 
-- [ ] T04 [UI] Job screen with live pipeline progress
+- [x] T04 [UI] Job screen with live pipeline progress
   Files: frontend/src/components/JobScreen.jsx, frontend/src/components/PipelineProgress.jsx, frontend/src/hooks/useJobPolling.js, frontend/src/App.jsx
   Do: `useJobPolling(jobId) -> {job, error, connectionLost}` polls getJob every 1500 ms while queued/running, then stops.
   PipelineProgress: the 4 steps, each with an icon state (pending/running spinner/done check/failed cross), label, detail,

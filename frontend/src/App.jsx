@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import UploadScreen from './components/UploadScreen';
+import JobScreen from './components/JobScreen';
 
 function parseHash(hash) {
   const current = hash || window.location.hash || '#/';
@@ -52,10 +53,7 @@ export default function App() {
         {route.name === 'upload' ? (
           <UploadScreen />
         ) : (
-          <section className="text-center py-20 space-y-4">
-            <h2 className="text-2xl font-bold tracking-tight text-text">Job {route.jobId}</h2>
-            <p className="text-sm text-text/60">Pipeline analysis in progress...</p>
-          </section>
+          <JobScreen jobId={route.jobId} />
         )}
       </main>
 

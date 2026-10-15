@@ -44,3 +44,4 @@ T18 done: chunk-bounded 25 MiB uploads, magic-byte gzip with 100 MiB expansion c
 T03 done: app shell, hash routing (#/ and #/job/<id>), drag-and-drop upload zone with client-side validation, sample selection and analyze triggers.
 T20 done: simulated BLAST timeout, same-id retry, startup INTERRUPTED recovery and atomic state reset; 2 real API recovery tests pass in 48.47s, 15 input tests pass. Added test_api_skeleton.py and test_qc.py to card file list for required recovery checks and test-store isolation.
 T22 done: versioned SHA-256 result cache, corrupt-cache fallback and scripts/precompute.py; all 3 real samples cached (22.08s/20.26s/26.65s compute), cached KPNIH1 API completes in 1.688s with cached:true. Simulation bypasses cache; bump jobs.RULES_VERSION whenever prediction rules change.
+T04 done: useJobPolling hook with 1500ms polling, PipelineProgress component with 4 step indicators and progress bar, and JobScreen with resume-on-refresh.
