@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useJobPolling } from '../hooks/useJobPolling';
 import PipelineProgress from './PipelineProgress';
+import SummaryBar from './SummaryBar';
+import AntibiogramGrid from './AntibiogramGrid';
 
 export default function JobScreen({ jobId }) {
   const { job, error, connectionLost } = useJobPolling(jobId);
+  const [selectedCall, setSelectedCall] = useState(null);
 
   return (
     <div className="w-full max-w-5xl mx-auto space-y-8">
@@ -111,32 +114,16 @@ export default function JobScreen({ jobId }) {
             </section>
           )}
 
-          {/* Results section placeholder (filled in by T06) */}
-          {job?.status === 'done' && (
-            <section
-              id="results-container"
-              className="rounded-2xl border border-navy-800 bg-navy-900 p-6 sm:p-8 shadow-xl space-y-6"
-            >
-              <div className="flex items-center justify-between pb-4 border-b border-navy-800">
-                <h3 className="text-xl font-bold text-text">Results ready</h3>
-                {job.cached && (
-                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-blue-500/15 border border-blue-500/30 text-blue-300">
-                    Cached result
-                  </span>
-                )}
-              </div>
-
-              {job.result?.summary?.headline && (
-                <div className="p-4 rounded-xl bg-navy-950 border border-navy-800/80">
-                  <p className="text-xs uppercase tracking-wider text-text/50 font-semibold mb-1">Headline</p>
-                  <p className="text-lg font-bold text-text">{job.result.summary.headline}</p>
-                </div>
-              )}
-
-              <p className="text-sm text-text/70">
-                Analysis complete. Antibiogram predictions and evidence will render here.
-              </p>
-            </section>
+          {/* Results section */}
+          {job?.status === 'done' && job?.result && (
+            <div id="results-container" className="space-y-8">
+              <SummaryBar summary={job.result.summary} />
+              <AntibiogramGrid
+                calls={job.result.calls}
+                disclaimer={job.result.disclaimer}
+                onSelect={(call) => setSelectedCall(call)}
+              />
+            </div>
           )}
         </div>
       )}

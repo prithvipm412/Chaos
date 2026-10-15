@@ -67,7 +67,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Depends on: none
   Done when: pytest covers good DNA, empty, plain text, protein, header-only, a tiny genome graded poor, N50 on a known example. All pass.
 
-- [ ] T06 [UI] Antibiogram grid + summary bar
+- [x] T06 [UI] Antibiogram grid + summary bar
   Files: frontend/src/components/AntibiogramGrid.jsx, frontend/src/components/SummaryBar.jsx, frontend/src/components/JobScreen.jsx
   Do: SummaryBar: the headline, counts (fail/uncertain/no_known) as chips, "Options with no known resistance: …".
   Grid: calls grouped by `group`, one tile per antibiotic. Tile colours: FAIL red "Likely to fail", UNCERTAIN amber "Uncertain",
