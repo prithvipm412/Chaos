@@ -87,7 +87,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Done when: test parses a 3-line canned outfmt-6 string (put the parser in `parse_outfmt6(text)`), and a quick manual run on
   eco_k12 returns >0 hits (record the timing in HANDOFF).
 
-- [ ] T08 [UI] Evidence drawer
+- [x] T08 [UI] Evidence drawer
   Files: frontend/src/components/EvidenceDrawer.jsx, frontend/src/components/JobScreen.jsx
   Do: A slide-over from the right (it animates and closes with Esc or the backdrop). It shows the antibiotic, the status and the reason,
   then one card per evidence hit_id (gene, family, identity %, coverage % as small bars, tier badge, contig:start–end,

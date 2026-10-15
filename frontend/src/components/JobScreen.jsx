@@ -3,6 +3,7 @@ import { useJobPolling } from '../hooks/useJobPolling';
 import PipelineProgress from './PipelineProgress';
 import SummaryBar from './SummaryBar';
 import AntibiogramGrid from './AntibiogramGrid';
+import EvidenceDrawer from './EvidenceDrawer';
 
 export default function JobScreen({ jobId }) {
   const { job, error, connectionLost } = useJobPolling(jobId);
@@ -124,6 +125,15 @@ export default function JobScreen({ jobId }) {
                 onSelect={(call) => setSelectedCall(call)}
               />
             </div>
+          )}
+
+          {/* Evidence Drawer */}
+          {selectedCall && (
+            <EvidenceDrawer
+              call={selectedCall}
+              hits={job?.result?.hits || []}
+              onClose={() => setSelectedCall(null)}
+            />
           )}
         </div>
       )}
