@@ -5,7 +5,7 @@ CORE checks run from `~/chaos`. UI checks run from `~/chaos-ui`. UI build check 
 UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
 
 ## FIX — lead puts urgent fixes here (do these first)
-- [ ] F3 [CORE] Headline must reflect poor QC, never a false "safe"
+- [x] F3 [CORE] Headline must reflect poor QC, never a false "safe"
   Files: backend/predict.py, backend/tests/test_predict.py, backend/jobs.py
   Note: jobs.py added for the required RULES_VERSION cache invalidation.
   Do: Bug — on kpn_kpc_partial (QC grade poor, KPC-3 excluded by the truncated assembly) every NO_KNOWN call is

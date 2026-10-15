@@ -117,3 +117,5 @@ F2 done: replaced dark-tuned Tailwind shades in EvidenceDrawer, QcPanel, JobScre
   uncertain"; a real FAIL still overrides, since a hit is a hit regardless of assembly quality.
 
 T21 done: added fading token-based connection banner and running-job resume link; build and controlled polling check pass (3 NETWORK errors, retained job, 5s backoff, INTERRUPTED recovery). Added JobScreen.jsx to card to replace its inline banner; live browser stop/restart check unavailable. T27 remains gated on UI T12/T19/T25.
+
+F3 done: poor/fair genomes without FAIL now show uncertainty headlines, while real FAIL retains its mechanism headline; 54 tests pass and all four sample caches regenerated. Added backend/jobs.py to card for required cache version bump v1-qc-headline-4; partial cache headline is now "Incomplete genome — results uncertain". T27 waits for T19/T25 to merge.
