@@ -73,3 +73,5 @@ T26 done: recent analyses API returns exact four-field rows newest first with bo
 T06 done: AntibiogramGrid grouped into 6 drug classes with 16 colored tiles, confidence and reasons, SummaryBar with headline and counts chips, and disclaimer.
 T08 done: animated EvidenceDrawer slide-over with Esc/backdrop dismiss, hit cards with identity/coverage bars, genomic coords and mechanism, plus empty-evidence state for NO_KNOWN drugs.
 T11 done: compact QcPanel displaying total length, contigs, N50, longest contig, GC%, N%, genes called, quality grade badge with warnings, and poor-grade incomplete genome banner.
+
+T28 done: real API regression covers all 3 samples, origins and NO_KNOWN reasons; 51 tests pass. Added backend/jobs.py to card to bump cache version after detecting stale CMY-23 headlines; all four sample caches regenerated with correct CTX-M-15 headline.

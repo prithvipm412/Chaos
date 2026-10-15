@@ -182,7 +182,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Done when: the mock shows acrB in the "not used" section.
 
 ## M2.5 — CORE spare capacity (added at 14:00 review; CORE finished M0-M2 early)
-- [ ] T28 [CORE] End-to-end upload API test, all 3 real samples
+- [x] T28 [CORE] End-to-end upload API test, all 3 real samples
   Files: backend/tests/test_e2e_samples.py, backend/jobs.py
   Note: Cache version bump required: real API regression exposed pre-fix CMY-23 headlines in existing caches.
   Do: TestClient test that POSTs each of kpn_kpc, eco_ctxm, eco_k12 via `sample_id` to /api/jobs (the T22 cache makes
