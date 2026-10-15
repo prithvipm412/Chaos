@@ -69,7 +69,7 @@ frontend/src/api.js  frontend/src/mock/*.json  frontend/src/hooks/  frontend/src
            "identity":100.0,"coverage":100.0,"tier":"exact","contig":"CP008830.1","start":15984,"end":16865,
            "strand":"+","origin":"acquired","used_for_calls":true,"rule":"carbapenemase"}],
   "calls":[{"antibiotic":"Meropenem","group":"Carbapenems","status":"FAIL","confidence":"high",
-            "evidence":["h1"],"reason":"KPC-3 carbapenemase (100% id, 100% cov)"}],
+            "evidence":["h1"],"reason":"KPC-3 carbapenemase (100% id, 100% cov)","tags":[]}],
   "summary":{"fail":9,"uncertain":2,"no_known":5,"headline":"Carbapenem-resistant (KPC) — avoid carbapenems",
              "options":["Amikacin","Colistin","Tigecycline"],
              "options_note":"Narrowest-spectrum options with no known resistance found, listed first-line to last-resort. Decision support only — confirm with lab AST."},
@@ -108,11 +108,19 @@ frontend/src/api.js  frontend/src/mock/*.json  frontend/src/hooks/  frontend/src
 6. Headline: by mechanism priority across ALL FAIL evidence, not genome position or group —
    carbapenemase → "Carbapenem-resistant (<gene>)"; elif esbl → "ESBL-producer (<gene>)";
    elif plasmid_ampc → "AmpC-producer (<gene>)"; elif narrow_beta_lactamase → "Beta-lactamase-producer (<gene>)";
+   elif no FAIL call at all AND qc.grade != 'good' → "Incomplete genome — results uncertain" (poor) /
+   "Low-confidence genome — results uncertain" (fair) — never the reassuring default on a genome we can't trust;
    else "No major acquired resistance found" (e.g. EC958 has both CMY-23 and CTX-M-15 FAIL Ceftriaxone —
    headline must say ESBL-producer (CTX-M-15), never AmpC). `options` = NO_KNOWN antibiotics.
-7. `options` (NO_KNOWN antibiotics) is sorted narrowest-spectrum-first by `rules.SPECTRUM_RANK`
-   (first-line → reserve-of-last-resort), so a doctor sees the least broad safe choice first, never Colistin/Meropenem
-   first. `options_note` (fixed string above) frames this as decision support, not a recommendation.
+7. Mutation-driven resistance we don't detect: Ciprofloxacin, Colistin, Tigecycline can only be FAIL/UNCERTAIN
+   via an acquired gene (qnr*, aac(6')-Ib-cr, mcr-*, tet(X), etc.); if none is found they are UNCERTAIN
+   ("Resistance often from mutations not assessed"), never NO_KNOWN — gene-presence absence says nothing about
+   point mutations, so they must never look like a safe option.
+8. Every call carries `tags` (list[str], default `[]`); Nitrofurantoin and Fosfomycin get `["urinary_tract_only"]`
+   (they only treat UTIs). `options` (NO_KNOWN antibiotics) is sorted narrowest-spectrum-first by
+   `rules.SPECTRUM_RANK` (first-line → reserve-of-last-resort) EXCEPT urinary-only drugs always sort after every
+   non-restricted option — never ranked first for a serious systemic infection just for being narrow-spectrum.
+   `options_note` (fixed string above) frames this as decision support, not a recommendation.
 Panel (16, `group`): Penicillins: Ampicillin, Amoxicillin-clavulanate, Piperacillin-tazobactam ·
 Cephalosporins: Ceftriaxone, Ceftazidime, Cefepime · Carbapenems: Meropenem, Imipenem ·
 Fluoroquinolones: Ciprofloxacin · Aminoglycosides: Gentamicin, Amikacin · Other: Co-trimoxazole,

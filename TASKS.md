@@ -5,6 +5,53 @@ CORE checks run from `~/chaos`. UI checks run from `~/chaos-ui`. UI build check 
 UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
 
 ## FIX — lead puts urgent fixes here (do these first)
+- [ ] F4 [CORE] Don't call NO_KNOWN for drugs that are usually mutation-resistant
+  Files: backend/predict.py, backend/tests/test_predict.py, backend/jobs.py
+  Note: jobs.py is for the required RULES_VERSION cache bump, same pattern as F3.
+  Do: Bug (user testing) — we don't detect point mutations, so NO_KNOWN overclaims for Ciprofloxacin, Colistin and
+  Tigecycline, where resistance is usually mutation-driven, not just gene presence. Confirmed live on kpn_kpc right
+  now: all three are NO_KNOWN and all three sit in `options` (Ciprofloxacin is literally recommended). Fix in
+  predict.py's per-drug loop: add `MUTATION_DRIVEN = {'Ciprofloxacin', 'Colistin', 'Tigecycline'}` and, immediately
+  BEFORE the existing `if status == 'NO_KNOWN' and qc['grade'] == 'poor':` check, insert
+  `if status == 'NO_KNOWN' and drug['antibiotic'] in MUTATION_DRIVEN: status, confidence, reason = 'UNCERTAIN', 'low', 'Resistance often from mutations not assessed.'`
+  (before, not after, so this reason isn't silently replaced by the poor-QC one). Leave Nitrofurantoin's existing
+  note-only handling untouched — it is not in scope here. Status only changes when there is truly no evidence: if
+  an acquired gene already made the drug FAIL or UNCERTAIN (e.g. qnr*, aac(6')-Ib-cr, mcr-*, tet(X)), that stands
+  unchanged — this only catches the NO_KNOWN (nothing found) case. Being UNCERTAIN automatically drops them out of
+  `summary.options` (it only lists NO_KNOWN), so no separate options-list change is needed here.
+  Interface: no JSON shape change — same call/summary fields, different values for these 3 drugs.
+  Depends on: T15, F3 (merge after F3's headline fix to avoid overlapping predict.py edits)
+  Done when: a regression test on the real kpn_kpc sample (same approach as T28/F3's tests) asserts Ciprofloxacin,
+  Colistin and Tigecycline are UNCERTAIN (not NO_KNOWN) and none of the three appear in `summary.options`. Full
+  suite passes, then `backend/.venv/bin/python scripts/precompute.py` to refresh caches (bump RULES_VERSION first).
+
+- [ ] F5 [CORE] Tag urinary-only antibiotics; don't let them rank first
+  Files: backend/rules.py, backend/predict.py, backend/tests/test_predict.py
+  Do: Bug (user testing) — Nitrofurantoin and Fosfomycin only treat urinary infections, but the narrowest-spectrum
+  sort (T29) puts them at the top of `summary.options` for ANY infection, including bloodstream/systemic ones.
+  rules.py: add `URINARY_ONLY = {'Nitrofurantoin', 'Fosfomycin'}` next to SPECTRUM_RANK. predict.py: when building
+  each call, add a field `tags: ['urinary_tract_only'] if drug['antibiotic'] in URINARY_ONLY else []` (import
+  URINARY_ONLY from rules). Change the `options` sort key from `SPECTRUM_RANK.__getitem__` to
+  `lambda a: (a in URINARY_ONLY, SPECTRUM_RANK[a])` so urinary-only drugs sort after every non-restricted option,
+  not before (same relative order among themselves).
+  Interface: PLAN.md "Job JSON" calls[].tags (new, list[str], default []) — update the example.
+  Depends on: F4 (merge after, same file)
+  Done when: a test on a NO_KNOWN-heavy fixture (e.g. eco_k12-shaped) asserts `options[0]` is never Nitrofurantoin
+  or Fosfomycin when any non-urinary NO_KNOWN option exists, and that both calls carry `tags: ['urinary_tract_only']`.
+
+- [ ] F6 [UI] Status badges overflow; show urinary tag; set tab title
+  Files: frontend/src/components/AntibiogramGrid.jsx, frontend/src/components/SummaryBar.jsx, frontend/index.html
+  Do: Bug (user testing, seen on K-12) — status badges overflow their card and overlap the drug name. Shorten the
+  3 labels to "Likely to fail" / "Uncertain" / "No known" (drop "resistance found" from the NO_KNOWN label) and make
+  sure the badge can wrap or shrink instead of overflowing (drop any fixed no-wrap/shrink-0 sizing that's forcing
+  it wide; let it wrap under the drug name if needed). In SummaryBar.jsx's options chips, read each option's
+  `tags` from F5 (cross-reference `calls` by antibiotic name) and show a small "UTI only" sub-label on any chip
+  tagged `urinary_tract_only`. In frontend/index.html, change `<title>` from "CHAOS boilerplate" to "Genome Firewall".
+  Depends on: F5 (for the tags field; the title/label parts have no dependency and can be done first)
+  Done when: `npm --prefix frontend run build` passes; on the K-12 mock/real result no badge text overlaps the
+  antibiotic name at normal card width; a urinary-only option chip shows "UTI only"; the browser tab reads
+  "Genome Firewall".
+
 - [x] F3 [CORE] Headline must reflect poor QC, never a false "safe"
   Files: backend/predict.py, backend/tests/test_predict.py, backend/jobs.py
   Note: jobs.py added for the required RULES_VERSION cache invalidation.

@@ -122,3 +122,21 @@ F3 done: poor/fair genomes without FAIL now show uncertainty headlines, while re
 T14 done: SVG ContigMap with scaled contig bars, hit markers coloured by tier (exact=blue solid, strict=purple outline, partial=amber dashed), grey intrinsic markers, hover tooltip with gene/coords, click opens EvidenceDrawer via call lookup.
 T17 done: collapsible GenesTable with "Used for predictions" and "Intrinsic — informational" sections, identity/coverage mini-bars, tier badges, rule column; acrB appears in intrinsic section.
 
+### Lead: 4 user-testing issues → FIX F4/F5/F6 added at top of TASKS.md
+- F4 [CORE]: confirmed live on the current kpn_kpc cache before writing the card — Ciprofloxacin, Colistin AND
+  Tigecycline are all NO_KNOWN and all three sit in `options` (Ciprofloxacin literally recommended), because we
+  don't detect point mutations and absence of an acquired gene was read as "no known resistance". Fix forces
+  UNCERTAIN for these 3 unless an acquired gene is actually found; unchanged otherwise. Sequenced after F3 (same
+  file, predict.py) to avoid both edits landing at once.
+  Also quietly caught in passing: PLAN.md point 6 never got F3's headline fix reflected back into it (code was
+  right, doc was stale) — fixed PLAN.md while touching this section, no code change needed.
+- F5 [CORE]: Nitrofurantoin/Fosfomycin are UTI-only but T29's narrowest-first sort put them at the top of
+  `options` for ANY infection, including the locked user's serious/systemic ones. Added a `tags` field per call
+  (`["urinary_tract_only"]` for those two) and moved them to sort after all non-restricted NO_KNOWN options.
+  Sequenced after F4 (same file).
+- F6 [UI]: short status labels ("Likely to fail"/"Uncertain"/"No known" — the long "No known resistance found"
+  was the one overflowing), an "UTI only" sub-label on tagged option chips (reads F5's tags), and the browser tab
+  title "Genome Firewall" (was still "CHAOS boilerplate"). Depends on F5 for the tags field.
+- PLAN.md updated: engineered-core points 6 (headline, now also documents F3's poor-QC case that was missing),
+  7 (mutation-driven drugs), 8 (tags + urinary-only sort); Job JSON calls[] gained `tags`.
+
