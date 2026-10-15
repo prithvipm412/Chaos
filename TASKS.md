@@ -136,7 +136,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Done when: picking the eco_ctxm sample on http://localhost:5173/#/ ends on a real grid with Ceftriaxone red.
 
 ## M2 — Engineered core (target 15:35)
-- [ ] T13 [CORE] Resistance rule table
+- [x] T13 [CORE] Resistance rule table
   Files: backend/rules.py, backend/tests/test_rules.py
   Do: Add `RULES = [{"name","match": compiled regex on gene name or family,"fail":[drugs],"uncertain":[drugs]}]` exactly as
   in PLAN.md "Rule table". Also add `INTRINSIC` (efflux / permeability / regulator mechanisms; EC-* and chromosomal ampC names) and

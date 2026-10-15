@@ -35,3 +35,4 @@ T05 done: FASTA validation, DNA/protein detection, N50/GC/N-content and quality 
 T07 done: meta-mode gene caller + bounded BLAST wrapper and outfmt parser; 2 tests pass, real K-12 check 4,319 ORFs / 230 alignments in 16.30s with 6 BLAST threads.
 T09 done: cached CARD index loader, full 16-drug panel and prediction v0 with QC guard; 2 prediction tests pass. V0 is deliberately temporary; T13/T15 must replace naive class mapping before clinical interpretation/demo.
 T10 done: real QC→genes→BLAST→prediction worker, existing-file sample registry, synchronous upload validation and annotated evidence; all 14 tests pass, EC958 API pipeline 17.776s with Ceftriaxone FAIL. UI T12 can integrate now; v0 class rules remain temporary until T15.
+T13 done: acquired-marker RULES and intrinsic exclusions, 19 rule/panel checks pass; named oqxAB rule takes precedence over broad efflux mechanism so its specified effect is UNCERTAIN only.
