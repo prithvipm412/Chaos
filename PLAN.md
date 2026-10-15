@@ -29,6 +29,7 @@ restart). The spike measured ~30–40 s per genome. Results are cached by input 
 - Backend: from `~/chaos`: `backend/.venv/bin/python -m uvicorn backend.main:app --port 8000`
 - Frontend: from `~/chaos-ui/frontend`: `npm install` (once), then `npm run dev -- --port 5173 --strictPort`
 - Python imports are absolute: `from backend.qc import parse_and_qc`. Tests: `backend/.venv/bin/python -m pytest backend/tests -q`
+- UI style: Clean light theme — white background (page #ffffff), grey neutrals (surfaces #f5f6f8, borders #e5e7eb, text #111827, secondary text #6b7280), subtle accent (#2563eb), strong accessible status colours (FAIL red, UNCERTAIN amber, NO KNOWN RESISTANCE green). All UI components use tokens only.
 ```
 backend/main.py     routes only            backend/jobs.py   job store, worker thread, cache, retry
 backend/qc.py       FASTA parse/validate/QC backend/genes.py  pyrodigal wrapper

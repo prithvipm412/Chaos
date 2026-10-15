@@ -26,21 +26,21 @@ export default function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-navy-950 text-text flex flex-col antialiased selection:bg-accent/30 selection:text-white">
-      <header className="border-b border-navy-800 bg-navy-900/90 backdrop-blur-md sticky top-0 z-30">
+    <div className="min-h-screen bg-bg-page text-text flex flex-col antialiased selection:bg-accent/20 selection:text-accent">
+      <header className="border-b border-border bg-white/95 backdrop-blur-md sticky top-0 z-30">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
           <a
             href="#/"
             className="flex flex-col hover:opacity-90 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-lg"
           >
             <h1 className="text-xl font-bold tracking-tight text-text">Genome Firewall</h1>
-            <p className="text-xs text-text/70">Antibiotic resistance from a bacterial genome, in minutes</p>
+            <p className="text-xs text-text-secondary">Antibiotic resistance from a bacterial genome, in minutes</p>
           </a>
 
           {route.name === 'job' && (
             <a
               href="#/"
-              className="text-xs font-medium text-accent hover:text-accent/80 transition-colors border border-navy-800 bg-navy-800/40 hover:bg-navy-800 px-3 py-1.5 rounded-lg flex items-center gap-1.5"
+              className="text-xs font-medium text-text hover:text-accent transition-colors border border-border bg-bg-surface hover:bg-gray-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-2xs"
             >
               <span>←</span>
               <span>New analysis</span>
@@ -57,7 +57,7 @@ export default function App() {
         )}
       </main>
 
-      <footer className="border-t border-navy-800/60 py-6 text-center text-xs text-text/40">
+      <footer className="border-t border-border py-6 text-center text-xs text-text-secondary">
         <p>Decision support only — confirm with lab AST. Absence of known genes does not prove susceptibility.</p>
       </footer>
     </div>

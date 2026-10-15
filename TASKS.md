@@ -5,7 +5,7 @@ CORE checks run from `~/chaos`. UI checks run from `~/chaos-ui`. UI build check 
 UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
 
 ## FIX — lead puts urgent fixes here (do these first)
-- [ ] F1 [UI] Light theme tokens + core surfaces
+- [x] F1 [UI] Light theme tokens + core surfaces
   Files: frontend/src/index.css, frontend/src/components/AntibiogramGrid.jsx, frontend/src/components/SummaryBar.jsx, frontend/src/components/PipelineProgress.jsx
   Do: Design change — the team is switching from navy to a clean light theme. In index.css `:root`, keep the SAME
   variable/class names but change their VALUES: --navy-950 (page) → #ffffff, --navy-900 (surface) → #f5f6f8,
@@ -21,7 +21,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Done when: `npm --prefix frontend run build` passes; `?mock#/job/j_mock01` shows a white page, grey surfaces, and
   the summary chips + antibiogram grid in clearly legible solid red/amber/green on white.
 
-- [ ] F2 [UI] Light theme: remaining components
+- [x] F2 [UI] Light theme: remaining components
   Files: frontend/src/components/EvidenceDrawer.jsx, frontend/src/components/QcPanel.jsx, frontend/src/components/JobScreen.jsx, frontend/src/components/UploadScreen.jsx
   Do: Same replacement as F1 — swap every dark-tuned Tailwind status shade (bg-red-950/*, text-*-300, etc.) for the
   --fail/--uncertain/--no-known/--text/--text-secondary tokens index.css now defines. No redesign, no layout change,
@@ -152,7 +152,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Depends on: T06
   Done when: the mock shows the panel. Temporarily editing the mock grade to poor shows the banner (revert it after).
 
-- [ ] T12 [UI] Integrate with the real backend
+- [x] T12 [UI] Integrate with the real backend
   Files: frontend/src/api.js, frontend/src/components/UploadScreen.jsx, frontend/src/components/JobScreen.jsx
   Do: Run without ?mock against the backend on :8000. Fix any shape mismatches in the UI only. If the backend is wrong
   versus PLAN.md, write a FIX note in HANDOFF.md instead of working around it. Uploading a real .fasta file works.

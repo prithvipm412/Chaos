@@ -1,33 +1,94 @@
 @import "tailwindcss";
 
 :root {
-  --navy-950: #0a1628;
-  --navy-900: #0f1f3d;
-  --navy-800: #172b54;
-  --accent: #4f8cff;
-  --text: #e6edf7;
-  font-family: Inter, system-ui, sans-serif;
-  background: var(--navy-950);
+  /* Clean Light Theme Tokens */
+  --bg-page: #ffffff;
+  --bg-surface: #f5f6f8;
+  --bg-surface-elevated: #ffffff;
+  --border: #e5e7eb;
+  --border-strong: #d1d5db;
+  --text: #111827;
+  --text-secondary: #6b7280;
+  --accent: #2563eb;
+  --accent-subtle: #eff6ff;
+
+  /* Accessible Status Colors */
+  --fail: #dc2626;
+  --fail-soft: rgba(220, 38, 38, 0.1);
+  --status-fail: #dc2626;
+  --status-fail-bg: #fef2f2;
+  --status-fail-border: #fca5a5;
+
+  --uncertain: #b45309;
+  --uncertain-soft: rgba(180, 83, 9, 0.1);
+  --status-uncertain: #b45309;
+  --status-uncertain-bg: #fffbeb;
+  --status-uncertain-border: #fcd34d;
+
+  --no-known: #15803d;
+  --no-known-soft: rgba(21, 128, 61, 0.1);
+  --status-noknown: #15803d;
+  --status-noknown-bg: #ecfdf5;
+  --status-noknown-border: #6ee7b7;
+
+  /* Direct navy variable aliases */
+  --navy-950: #ffffff;
+  --navy-900: #f5f6f8;
+  --navy-800: #e5e7eb;
+
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--bg-page);
   color: var(--text);
 }
 
 @theme inline {
-  --color-navy-950: var(--navy-950);
-  --color-navy-900: var(--navy-900);
-  --color-navy-800: var(--navy-800);
-  --color-accent: var(--accent);
+  --color-bg-page: var(--bg-page);
+  --color-bg-surface: var(--bg-surface);
+  --color-bg-surface-elevated: var(--bg-surface-elevated);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
   --color-text: var(--text);
+  --color-text-secondary: var(--text-secondary);
+  --color-accent: var(--accent);
+  --color-accent-subtle: var(--accent-subtle);
+
+  /* Status Colors */
+  --color-fail: var(--fail);
+  --color-fail-soft: var(--fail-soft);
+  --color-fail-bg: var(--status-fail-bg);
+  --color-fail-border: var(--status-fail-border);
+
+  --color-uncertain: var(--uncertain);
+  --color-uncertain-soft: var(--uncertain-soft);
+  --color-uncertain-bg: var(--status-uncertain-bg);
+  --color-uncertain-border: var(--status-uncertain-border);
+
+  --color-no-known: var(--no-known);
+  --color-no-known-soft: var(--no-known-soft);
+  --color-noknown: var(--status-noknown);
+  --color-noknown-bg: var(--status-noknown-bg);
+  --color-noknown-border: var(--status-noknown-border);
+
+  /* Legacy aliases mapped to clean light palette to prevent dark leaks */
+  --color-navy-950: var(--bg-page);
+  --color-navy-900: var(--bg-surface);
+  --color-navy-800: var(--border);
 }
 
-@keyframes fade-in {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes slide-in-right {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
 }
 
-.boilerplate-card {
-  animation: fade-in 450ms ease-out both;
+.animate-slide-in {
+  animation: slide-in-right 240ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .boilerplate-card { animation: none; }
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

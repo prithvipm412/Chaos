@@ -170,22 +170,24 @@ export default function UploadScreen() {
   return (
     <div className="w-full max-w-4xl mx-auto space-y-8">
       {/* Upload Box */}
-      <section className="rounded-2xl border border-navy-800 bg-navy-900 p-8 shadow-2xl backdrop-blur-sm transition-all duration-200">
-        <h2 className="text-xl font-semibold text-text tracking-tight mb-2">Upload Assembled Genome</h2>
-        <p className="text-sm text-text/70 mb-6">
-          Provide contigs in FASTA format (.fa, .fasta, .fna, or .gz up to 25 MB).
-        </p>
+      <section className="rounded-2xl border border-border bg-white p-6 sm:p-8 shadow-xs space-y-6">
+        <div>
+          <h2 className="text-xl font-semibold text-text tracking-tight">Upload Assembled Genome</h2>
+          <p className="text-sm text-text-secondary mt-1">
+            Provide contigs in FASTA format (.fa, .fasta, .fna, or .gz up to 25 MB).
+          </p>
+        </div>
 
         <div
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          className={`flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-xl transition-colors cursor-pointer text-center ${
+          className={`flex flex-col items-center justify-center p-8 sm:p-10 border-2 border-dashed rounded-xl transition-all cursor-pointer text-center ${
             isDragOver
-              ? 'border-accent bg-accent/10'
+              ? 'border-accent bg-accent-subtle'
               : selectedFile
-              ? 'border-accent/60 bg-navy-950/60'
-              : 'border-navy-800 bg-navy-950/40 hover:border-navy-800/80 hover:bg-navy-950/60'
+              ? 'border-accent bg-accent-subtle/40'
+              : 'border-border-strong bg-bg-surface hover:border-gray-400 hover:bg-gray-100/70'
           }`}
           onClick={() => fileInputRef.current?.click()}
           role="button"
@@ -207,7 +209,7 @@ export default function UploadScreen() {
           />
 
           <svg
-            className={`w-12 h-12 mb-3 transition-colors ${selectedFile ? 'text-accent' : 'text-text/40'}`}
+            className={`w-12 h-12 mb-3 transition-colors ${selectedFile ? 'text-accent' : 'text-gray-400'}`}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -223,16 +225,16 @@ export default function UploadScreen() {
 
           {selectedFile ? (
             <div className="space-y-1">
-              <p className="text-sm font-medium text-text">{selectedFile.name}</p>
-              <p className="text-xs text-text/60">{formatBytes(selectedFile.size)}</p>
-              <p className="text-xs text-accent mt-2">Click or drop another file to change</p>
+              <p className="text-sm font-semibold text-text">{selectedFile.name}</p>
+              <p className="text-xs text-text-secondary">{formatBytes(selectedFile.size)}</p>
+              <p className="text-xs text-accent font-medium mt-2">Click or drop another file to change</p>
             </div>
           ) : (
             <div className="space-y-1">
               <p className="text-sm font-medium text-text">
                 <span className="text-accent underline underline-offset-2">Click to select</span> or drag and drop
               </p>
-              <p className="text-xs text-text/50">Supports .fasta, .fa, .fna, .gz (max 25 MB)</p>
+              <p className="text-xs text-text-secondary">Supports .fasta, .fa, .fna, .gz (max 25 MB)</p>
             </div>
           )}
         </div>
@@ -240,24 +242,24 @@ export default function UploadScreen() {
         {clientError && (
           <div
             role="alert"
-            className="mt-4 p-4 rounded-xl bg-red-950/50 border border-red-500/40 text-red-200 text-sm flex items-start gap-3"
+            className="p-4 rounded-xl bg-fail-bg border border-fail-border text-fail text-sm flex items-start gap-3"
           >
-            <svg className="w-5 h-5 text-red-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
-            <div className="leading-relaxed">{clientError}</div>
+            <div className="leading-relaxed font-medium">{clientError}</div>
           </div>
         )}
 
-        <div className="mt-6 flex justify-end">
+        <div className="flex justify-end pt-2">
           <button
             type="button"
             disabled={!selectedFile || submitting}
             onClick={() => triggerUpload(selectedFile)}
-            className={`px-6 py-2.5 rounded-xl font-medium text-sm transition-all shadow-md ${
+            className={`px-6 py-2.5 rounded-xl font-medium text-sm transition-all shadow-2xs ${
               selectedFile && !submitting
-                ? 'bg-accent text-white hover:brightness-110 active:scale-98 cursor-pointer'
-                : 'bg-navy-800 text-text/40 cursor-not-allowed'
+                ? 'bg-accent text-white hover:bg-blue-700 active:scale-98 cursor-pointer'
+                : 'bg-gray-100 text-gray-400 border border-border cursor-not-allowed'
             }`}
           >
             {submitting ? 'Submitting...' : 'Analyze'}
@@ -269,17 +271,17 @@ export default function UploadScreen() {
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-text tracking-tight">Or test with reference clinical samples</h2>
-          <span className="text-xs text-text/50">Instant results</span>
+          <span className="text-xs text-text-secondary">Instant results</span>
         </div>
 
         {loadingSamples ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-28 rounded-xl border border-navy-800 bg-navy-900/60 animate-pulse p-4" />
+              <div key={i} className="h-28 rounded-xl border border-border bg-white animate-pulse p-4 shadow-2xs" />
             ))}
           </div>
         ) : samplesError ? (
-          <div className="p-4 rounded-xl border border-red-500/30 bg-red-950/20 text-red-300 text-sm">
+          <div className="p-4 rounded-xl border border-fail-border bg-fail-bg text-fail text-sm">
             {samplesError}
           </div>
         ) : (
@@ -295,22 +297,22 @@ export default function UploadScreen() {
                     handleSelectSample(sample);
                   }
                 }}
-                className="group relative rounded-xl border border-navy-800 bg-navy-900 p-5 hover:border-accent/60 hover:bg-navy-800/60 transition-all cursor-pointer shadow-md flex flex-col justify-between"
+                className="group relative rounded-xl border border-border bg-white p-5 hover:border-accent hover:shadow-sm transition-all cursor-pointer flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-start justify-between gap-2">
                     <h3 className="font-semibold text-text text-sm group-hover:text-accent transition-colors">
                       {sample.label}
                     </h3>
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-navy-800 text-text/70 border border-navy-800 shrink-0">
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-bg-surface text-text-secondary border border-border shrink-0">
                       Sample
                     </span>
                   </div>
-                  <p className="text-xs text-text/60 italic mt-1">{sample.organism}</p>
+                  <p className="text-xs text-text-secondary italic mt-1">{sample.organism}</p>
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-navy-800/80 flex items-center justify-between text-xs">
-                  <span className="text-text/70 font-mono text-[11px]">{sample.note}</span>
+                <div className="mt-4 pt-3 border-t border-border flex items-center justify-between text-xs">
+                  <span className="text-text-secondary font-mono text-[11px]">{sample.note}</span>
                   <span className="text-accent group-hover:translate-x-0.5 transition-transform font-medium">
                     Analyze →
                   </span>

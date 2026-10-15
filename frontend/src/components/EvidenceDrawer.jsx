@@ -3,25 +3,25 @@ import React, { useEffect } from 'react';
 const STATUS_CONFIG = {
   FAIL: {
     label: 'Likely to fail',
-    badgeClass: 'bg-red-500/20 border-red-500/40 text-red-300',
-    dot: 'bg-red-400',
+    badgeClass: 'bg-fail-bg border-fail-border text-fail font-semibold',
+    dot: 'bg-fail',
   },
   UNCERTAIN: {
     label: 'Uncertain',
-    badgeClass: 'bg-amber-500/20 border-amber-500/40 text-amber-300',
-    dot: 'bg-amber-400',
+    badgeClass: 'bg-uncertain-bg border-uncertain-border text-uncertain font-semibold',
+    dot: 'bg-uncertain',
   },
   NO_KNOWN: {
     label: 'No known resistance found',
-    badgeClass: 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300',
-    dot: 'bg-emerald-400',
+    badgeClass: 'bg-noknown-bg border-noknown-border text-noknown font-semibold',
+    dot: 'bg-noknown',
   },
 };
 
 const TIER_CONFIG = {
-  exact: 'bg-blue-500/20 border-blue-500/40 text-blue-300',
-  strict: 'bg-purple-500/20 border-purple-500/40 text-purple-300',
-  partial: 'bg-amber-500/20 border-amber-500/40 text-amber-300',
+  exact: 'bg-blue-50 border-blue-200 text-blue-700',
+  strict: 'bg-purple-50 border-purple-200 text-purple-700',
+  partial: 'bg-amber-50 border-amber-200 text-amber-700',
 };
 
 export default function EvidenceDrawer({ call, hits = [], onClose }) {
@@ -50,18 +50,18 @@ export default function EvidenceDrawer({ call, hits = [], onClose }) {
     >
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-navy-950/70 backdrop-blur-sm transition-opacity duration-200"
+        className="fixed inset-0 bg-gray-900/40 backdrop-blur-xs transition-opacity duration-200"
         onClick={onClose}
         aria-hidden="true"
       />
 
       {/* Slide-over panel */}
-      <aside className="relative w-full max-w-lg bg-navy-900 border-l border-navy-800 shadow-2xl flex flex-col h-full z-10 overflow-y-auto animate-slide-in">
+      <aside className="relative w-full max-w-lg bg-white border-l border-border shadow-2xl flex flex-col h-full z-10 overflow-y-auto animate-slide-in text-text">
         {/* Drawer Header */}
-        <div className="p-6 border-b border-navy-800 bg-navy-900/90 sticky top-0 z-20 backdrop-blur-md">
+        <div className="p-6 border-b border-border bg-white/95 sticky top-0 z-20 backdrop-blur-md">
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-1">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-text/50">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-text-secondary">
                 {call.group || 'Antibiotic Panel'}
               </span>
               <h2 id="drawer-title" className="text-2xl font-bold text-text tracking-tight">
@@ -72,7 +72,7 @@ export default function EvidenceDrawer({ call, hits = [], onClose }) {
             <button
               type="button"
               onClick={onClose}
-              className="p-2 rounded-xl text-text/60 hover:text-text hover:bg-navy-800 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="p-2 rounded-xl text-text-secondary hover:text-text hover:bg-gray-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               aria-label="Close drawer"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -82,21 +82,21 @@ export default function EvidenceDrawer({ call, hits = [], onClose }) {
           </div>
 
           {/* Status & Reason Summary */}
-          <div className="mt-4 pt-4 border-t border-navy-800/80 space-y-2">
+          <div className="mt-4 pt-4 border-t border-border space-y-2">
             <div className="flex items-center gap-2">
               <span
-                className={`text-xs font-semibold px-2.5 py-1 rounded-full border flex items-center gap-1.5 ${statusConfig.badgeClass}`}
+                className={`text-xs px-2.5 py-1 rounded-full border flex items-center gap-1.5 ${statusConfig.badgeClass}`}
               >
                 <span className={`w-1.5 h-1.5 rounded-full ${statusConfig.dot}`} />
                 <span>{statusConfig.label}</span>
               </span>
               {call.confidence && (
-                <span className="text-xs font-mono text-text/50 capitalize">
+                <span className="text-xs font-mono text-text-secondary capitalize">
                   {call.confidence} confidence
                 </span>
               )}
             </div>
-            <p className="text-xs text-text/80 leading-relaxed font-medium bg-navy-950/60 p-3 rounded-lg border border-navy-800">
+            <p className="text-xs text-text leading-relaxed font-medium bg-bg-surface p-3 rounded-lg border border-border">
               {call.reason}
             </p>
           </div>
@@ -107,7 +107,7 @@ export default function EvidenceDrawer({ call, hits = [], onClose }) {
           {evidenceHits.length > 0 ? (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-text/60">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
                   Detected Resistance Evidence ({evidenceHits.length})
                 </h3>
               </div>
@@ -119,7 +119,7 @@ export default function EvidenceDrawer({ call, hits = [], onClose }) {
                   return (
                     <article
                       key={hit.hit_id}
-                      className="rounded-xl border border-navy-800 bg-navy-950/70 p-5 shadow-md space-y-4"
+                      className="rounded-xl border border-border bg-bg-surface p-5 shadow-2xs space-y-4"
                     >
                       {/* Hit Header */}
                       <div className="flex items-start justify-between gap-2">
@@ -132,10 +132,10 @@ export default function EvidenceDrawer({ call, hits = [], onClose }) {
                               {hit.tier}
                             </span>
                           </div>
-                          <p className="text-xs text-text/60 mt-0.5">{hit.family}</p>
+                          <p className="text-xs text-text-secondary mt-0.5">{hit.family}</p>
                         </div>
                         {hit.aro && (
-                          <span className="text-[11px] font-mono text-accent/80 bg-accent/10 px-2 py-0.5 rounded border border-accent/20">
+                          <span className="text-[11px] font-mono text-accent bg-accent-subtle px-2 py-0.5 rounded border border-blue-200">
                             {hit.aro}
                           </span>
                         )}
@@ -145,10 +145,10 @@ export default function EvidenceDrawer({ call, hits = [], onClose }) {
                       <div className="grid grid-cols-2 gap-4 pt-2">
                         <div className="space-y-1.5">
                           <div className="flex justify-between text-xs font-mono">
-                            <span className="text-text/60">Identity</span>
+                            <span className="text-text-secondary">Identity</span>
                             <span className="text-text font-semibold">{hit.identity?.toFixed(1)}%</span>
                           </div>
-                          <div className="w-full h-1.5 rounded-full bg-navy-800 overflow-hidden">
+                          <div className="w-full h-1.5 rounded-full bg-gray-200 overflow-hidden">
                             <div
                               className="h-full bg-accent rounded-full transition-all duration-300"
                               style={{ width: `${Math.min(100, hit.identity || 0)}%` }}
@@ -158,12 +158,12 @@ export default function EvidenceDrawer({ call, hits = [], onClose }) {
 
                         <div className="space-y-1.5">
                           <div className="flex justify-between text-xs font-mono">
-                            <span className="text-text/60">Coverage</span>
+                            <span className="text-text-secondary">Coverage</span>
                             <span className="text-text font-semibold">{hit.coverage?.toFixed(1)}%</span>
                           </div>
-                          <div className="w-full h-1.5 rounded-full bg-navy-800 overflow-hidden">
+                          <div className="w-full h-1.5 rounded-full bg-gray-200 overflow-hidden">
                             <div
-                              className="h-full bg-blue-400 rounded-full transition-all duration-300"
+                              className="h-full bg-indigo-600 rounded-full transition-all duration-300"
                               style={{ width: `${Math.min(100, hit.coverage || 0)}%` }}
                             />
                           </div>
@@ -171,25 +171,25 @@ export default function EvidenceDrawer({ call, hits = [], onClose }) {
                       </div>
 
                       {/* Location & Mechanism Metadata */}
-                      <div className="pt-3 border-t border-navy-800/80 space-y-2 text-xs">
+                      <div className="pt-3 border-t border-border space-y-2 text-xs">
                         <div className="flex items-center justify-between">
-                          <span className="text-text/50">Genomic locus</span>
-                          <span className="font-mono text-text/80 text-[11px]">
+                          <span className="text-text-secondary">Genomic locus</span>
+                          <span className="font-mono text-text text-[11px] font-medium">
                             {hit.contig}:{hit.start}–{hit.end} ({hit.strand})
                           </span>
                         </div>
 
                         {hit.mechanism && (
                           <div className="flex items-center justify-between">
-                            <span className="text-text/50">Mechanism</span>
-                            <span className="text-text/80 capitalize">{hit.mechanism}</span>
+                            <span className="text-text-secondary">Mechanism</span>
+                            <span className="text-text capitalize font-medium">{hit.mechanism}</span>
                           </div>
                         )}
 
                         {hit.rule && (
                           <div className="flex items-center justify-between">
-                            <span className="text-text/50">Rule fired</span>
-                            <span className="text-accent/80 font-mono text-[11px]">{hit.rule}</span>
+                            <span className="text-text-secondary">Rule fired</span>
+                            <span className="text-accent font-mono text-[11px] font-medium">{hit.rule}</span>
                           </div>
                         )}
                       </div>
@@ -199,8 +199,8 @@ export default function EvidenceDrawer({ call, hits = [], onClose }) {
               </div>
             </div>
           ) : (
-            <div className="rounded-xl border border-navy-800 bg-navy-950/50 p-6 text-center space-y-3">
-              <div className="w-10 h-10 rounded-full bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mx-auto">
+            <div className="rounded-xl border border-border bg-bg-surface p-6 text-center space-y-3">
+              <div className="w-10 h-10 rounded-full bg-noknown-bg border border-noknown-border flex items-center justify-center text-noknown mx-auto">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                 </svg>
@@ -208,7 +208,7 @@ export default function EvidenceDrawer({ call, hits = [], onClose }) {
               <p className="text-sm font-semibold text-text">
                 No known resistance genes for this drug were found in this genome.
               </p>
-              <p className="text-xs text-text/60 leading-relaxed max-w-sm mx-auto">
+              <p className="text-xs text-text-secondary leading-relaxed max-w-sm mx-auto">
                 Absence of recognized acquired resistance mechanisms indicates this antibiotic remains an option to consider, subject to clinical judgment and standard AST confirmation.
               </p>
             </div>
@@ -216,11 +216,11 @@ export default function EvidenceDrawer({ call, hits = [], onClose }) {
         </div>
 
         {/* Drawer Footer */}
-        <div className="p-4 border-t border-navy-800 bg-navy-900/90 text-center">
+        <div className="p-4 border-t border-border bg-white">
           <button
             type="button"
             onClick={onClose}
-            className="w-full py-2.5 rounded-xl border border-navy-800 bg-navy-800 hover:bg-navy-800/80 text-text font-medium text-xs transition-colors"
+            className="w-full py-2.5 rounded-xl border border-border bg-bg-surface hover:bg-gray-100 text-text font-medium text-xs transition-colors shadow-2xs"
           >
             Close Evidence
           </button>

@@ -74,7 +74,6 @@ T26 done: recent analyses API returns exact four-field rows newest first with bo
 T06 done: AntibiogramGrid grouped into 6 drug classes with 16 colored tiles, confidence and reasons, SummaryBar with headline and counts chips, and disclaimer.
 T08 done: animated EvidenceDrawer slide-over with Esc/backdrop dismiss, hit cards with identity/coverage bars, genomic coords and mechanism, plus empty-evidence state for NO_KNOWN drugs.
 T11 done: compact QcPanel displaying total length, contigs, N50, longest contig, GC%, N%, genes called, quality grade badge with warnings, and poor-grade incomplete genome banner.
-
 T28 done: real API regression covers all 3 samples, origins and NO_KNOWN reasons; 51 tests pass. Added backend/jobs.py to card to bump cache version after detecting stale CMY-23 headlines; all four sample caches regenerated with correct CTX-M-15 headline.
 
 T29 done: all 16 drugs ranked narrowest/first-line to last-resort, NO_KNOWN options sorted and exact PLAN options_note added; 52 backend tests pass. Added backend/jobs.py to card for required cache version bump (v1-options-3); all four sample caches regenerated. All CORE cards complete.
@@ -103,3 +102,7 @@ T29 done: all 16 drugs ranked narrowest/first-line to last-resort, NO_KNOWN opti
   with the exact hex values, as the authoritative source for this project.
 - No lead edits to any frontend file itself — F1/F2/T21/T27 are task cards for the executors, per CLAUDE.md
   ("you do not write feature code").
+
+T12 done: verified real backend integration against :8000; eco_ctxm sample completes with Ceftriaxone FAIL and accurate prediction payload.
+F1 done: switched UI to clean light theme tokens in index.css and updated AntibiogramGrid, SummaryBar, PipelineProgress with accessible status tokens.
+F2 done: replaced dark-tuned Tailwind shades in EvidenceDrawer, QcPanel, JobScreen, UploadScreen with light theme tokens; all UI components use tokens only.
