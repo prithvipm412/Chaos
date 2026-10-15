@@ -1,7 +1,7 @@
 # TASKS.md — written by the lead
 Executors: take the first unchecked card in your lane. [CORE] = Codex (~/chaos). [UI] = Codex (~/chaos-ui), as of
-the 15:40 review. NOTHING NEW STARTS AFTER 16:15 (freeze 16:30) — if you pick up a card after 16:15, stop and leave
-it unstarted for the lead instead.
+the 15:40 review. NOTHING NEW STARTS AFTER 16:15 (code freeze 16:45, everything done by 17:15, submission 17:30) —
+if you pick up a card after 16:15, stop and leave it unstarted for the lead instead.
 Every card: read PLAN.md first, since the JSON shapes there are the contract. Touch only the listed files.
 CORE checks run from `~/chaos`. UI checks run from `~/chaos-ui`. UI build check = `npm --prefix frontend run build`.
 UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
