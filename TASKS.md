@@ -26,7 +26,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
 - [ ] T02 [UI] API client + mock fixtures
   Files: frontend/src/api.js, frontend/src/mock/samples.json, frontend/src/mock/job_done.json, frontend/src/mock/job_failed.json
   Do: job_done.json = the full PLAN.md Job JSON, extended to all 16 antibiotics (9 FAIL, 2 UNCERTAIN, 5 NO_KNOWN), 4 hits
-  (KPC-3 exact, TEM-1 exact, aac(6')-Ib-cr strict, acrB used_for_calls:false) and 5 contigs. job_failed.json = failed at
+  (KPC-3 exact, TEM-1 exact, aac(6')-Ib-cr strict, acrB origin:intrinsic used_for_calls:false; every hit has `origin`) and 5 contigs. job_failed.json = failed at
   the blast step, error BLAST_TIMEOUT retryable:true, result null. samples.json = the 4 PLAN.md samples.
   api.js exports: `listSamples()`, `createJob({file, sampleId, simulate})`, `getJob(id)`, `retryJob(id)`, `listJobs(limit)`,
   `class ApiError {status, code, message, hint}`. API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8000'.
@@ -100,8 +100,9 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Do: card.py: `load_card_index(card_dir) -> dict[aro, {name, family, drug_classes: list[str], mechanism}]` from
   aro_index.tsv (split Drug Class on ';', lowercase it, and strip " antibiotic"). Cache it in a module global.
   rules.py: `PANEL = [{"antibiotic","group","classes":[CARD drug classes]}]` for the 16 PLAN.md drugs.
-  predict.py v0: `predict(hits: list[dict], qc: dict) -> {"calls": [...], "summary": {...}}`. A strict/exact hit whose
-  drug_classes cover the drug → FAIL. A partial hit → UNCERTAIN. Otherwise NO_KNOWN. Apply the QC guard. Calls/summary use the exact
+  predict.py v0: `predict(hits: list[dict], qc: dict) -> {"calls": [...], "summary": {...}}`. Only a strict/exact hit with
+  mechanism "antibiotic inactivation" whose drug_classes cover the drug → FAIL. All other mechanisms (efflux, regulator, etc.) → set
+  origin "intrinsic" and used_for_calls false, and never use them for a call. A partial hit → UNCERTAIN. Otherwise NO_KNOWN. Apply the QC guard. Calls/summary use the exact
   PLAN.md shape and include the disclaimer. (T15 replaces the logic and keeps the signature.)
   Depends on: T07
   Done when: test with a fake KPC-3 hit gives Meropenem FAIL; an empty hit list with poor QC gives no NO_KNOWN at all.
@@ -111,7 +112,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Do: samples.py: `SAMPLES = [{id, label, organism, note, path}]` for the 4 ids (paths: kpn_kpc→data/samples/kp_kpc.fasta,
   eco_ctxm→ecoli_ctxm.fasta, eco_k12→ecoli_k12.fasta; kpn_kpc_partial→kpn_kpc_partial.fasta from T23. List only files that exist). /api/samples returns them without the path.
   The worker replaces the fake runner: qc → genes → blast → annotate hits with card index + tier + contig coords
-  (hit_id h1..hN; used_for_calls default true) → predict → result (contigs = 30 longest + any with a hit).
+  (hit_id h1..hN; origin + used_for_calls from predict) → predict → result (contigs = 30 longest + any with a hit).
   Each step sets running/done, elapsed_s and detail strings like PLAN.md. Exceptions → status failed with an error code
   (BlastError code, GENE_CALLING_FAILED, otherwise INTERNAL), and the job never hangs. QC InputError on upload → 400 in POST
   (run QC synchronously in the route before queueing).
@@ -139,7 +140,8 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Files: backend/rules.py, backend/tests/test_rules.py
   Do: Add `RULES = [{"name","match": compiled regex on gene name or family,"fail":[drugs],"uncertain":[drugs]}]` exactly as
   in PLAN.md "Rule table". Also add `INTRINSIC` (efflux / permeability / regulator mechanisms; EC-* and chromosomal ampC names) and
-  `match_rule(gene, family, mechanism) -> rule|"intrinsic"|None`. Keep PANEL.
+  `classify(gene, family, mechanism) -> ("acquired", rule) | ("intrinsic", None) | ("unclassified", None)`, checking INTRINSIC first.
+  Keep PANEL. See PLAN.md "Acquired vs intrinsic".
   Depends on: T09
   Done when: tests cover KPC-3→carbapenemase, NDM-1, OXA-48, OXA-1→narrow, CTX-M-15→ESBL, TEM-1→narrow, SHV-12→ESBL,
   SHV-1→narrow, CMY-2→AmpC, armA, mcr-1, acrB→intrinsic, EC-5→intrinsic.
@@ -155,26 +157,26 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
 - [ ] T15 [CORE] Prediction engine v1
   Files: backend/predict.py, backend/jobs.py, backend/tests/test_predict.py
   Do: Implement PLAN.md "Engineered core" steps 1–6 exactly. This covers best hit per ORF by bitscore (do it in jobs.py annotation),
-  tiers, rule effects, intrinsic → used_for_calls:false + rule "intrinsic", fallback UNCERTAIN, allele caution
+  tiers, rule effects, origin via rules.classify (intrinsic → used_for_calls:false + rule "intrinsic"; only acquired can FAIL; unclassified → at most UNCERTAIN), allele caution
   (SHV/TEM non-exact → UNCERTAIN), the sul+dfrA pairing, the combine logic, confidence, the QC guard, mutation notes, headline and options.
   Set the hit's `rule` field to the rule name. `reason` names the gene with its id/cov.
   Depends on: T13
   Done when: tests pass for KPC → all 8 beta-lactams FAIL plus a carbapenem headline; CTX-M-15 only → Meropenem NO_KNOWN and Ceftriaxone FAIL;
-  acrB only → all NO_KNOWN; sul1 alone → Co-trimoxazole UNCERTAIN; poor QC → zero NO_KNOWN.
+  acrB only → all NO_KNOWN; sul1 alone → Co-trimoxazole UNCERTAIN; poor QC → zero NO_KNOWN; the real K-12 hits loaded from data/spike/ecoli_k12.hits.tsv → zero FAIL (skip the test if the file is missing).
 
 - [ ] T16 [CORE] Validate on the 3 real samples
   Files: scripts/run_samples.py, backend/rules.py
   Do: Known real markers (spike): kp_kpc KPC-3, SHV-11, TEM-1, FosA6, oqxAB, sul1, dfrA12;
   eco_ctxm CTX-M-15, CMY-23, OXA-1, TEM-1, sul1, tet(A); eco_k12 ampC + efflux only. The script runs the pipeline functions directly (no server) on each sample and prints a table of antibiotic × status,
   plus the hits used and ignored. Tune the RULES/INTRINSIC regexes only, until: kpn_kpc → Meropenem FAIL; eco_ctxm → Ceftriaxone FAIL
-  and Meropenem not FAIL; eco_k12 → no FAIL at all (except Ampicillin if a real acquired bla is present, which you must explain).
+  and Meropenem not FAIL; eco_k12 → ZERO FAIL calls (hard requirement; fix INTRINSIC, never the threshold).
   Depends on: T15
   Done when: `backend/.venv/bin/python scripts/run_samples.py` meets those 3 checks. Paste the 3 headlines into HANDOFF.
 
 - [ ] T17 [UI] "All genes detected" table
   Files: frontend/src/components/GenesTable.jsx, frontend/src/components/JobScreen.jsx
   Do: A collapsible table of all hits: gene, family, identity, coverage, tier, contig, rule. Two sections:
-  "Used for predictions" and "Detected but not used (intrinsic/efflux — common in all strains)". This makes the
+  "Used for predictions" and "Intrinsic — informational (efflux/chromosomal genes found in normal strains; not used for predictions)". This makes the
   engine's judgement visible to the judges.
   Depends on: T08
   Done when: the mock shows acrB in the "not used" section.

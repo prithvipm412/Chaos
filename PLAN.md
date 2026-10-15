@@ -66,7 +66,7 @@ frontend/src/api.js  frontend/src/mock/*.json  frontend/src/hooks/  frontend/src
   "hits":[{"hit_id":"h1","gene":"KPC-3","aro":"ARO:3002312","family":"KPC beta-lactamase",
            "drug_classes":["carbapenem","cephalosporin","penam"],"mechanism":"antibiotic inactivation",
            "identity":100.0,"coverage":100.0,"tier":"exact","contig":"CP008830.1","start":15984,"end":16865,
-           "strand":"+","used_for_calls":true,"rule":"carbapenemase"}],
+           "strand":"+","origin":"acquired","used_for_calls":true,"rule":"carbapenemase"}],
   "calls":[{"antibiotic":"Meropenem","group":"Carbapenems","status":"FAIL","confidence":"high",
             "evidence":["h1"],"reason":"KPC-3 carbapenemase (100% id, 100% cov)"}],
   "summary":{"fail":9,"uncertain":2,"no_known":5,"headline":"Carbapenem-resistant (KPC) — avoid carbapenems",
@@ -92,8 +92,12 @@ frontend/src/api.js  frontend/src/mock/*.json  frontend/src/hooks/  frontend/src
    armA, rmtA–F → FAIL Gentamicin+Amikacin · qnr*, oqxAB → UNCERTAIN Ciprofloxacin ·
    sul* AND dfrA* → FAIL Co-trimoxazole (only one → UNCERTAIN) · mcr-* → FAIL Colistin · tet(X) → FAIL Tigecycline ·
    fosA3/4 → FAIL Fosfomycin, other fosA → UNCERTAIN.
-   **Intrinsic/ignore**: mechanism efflux / permeability / regulator, chromosomal EC-*/ampC → `used_for_calls:false`.
-   **Fallback**: unmatched inactivation gene → UNCERTAIN for panel drugs in its CARD drug class (never FAIL).
+   **Acquired vs intrinsic (spike lesson: K-12 has ~50 strict intrinsic hits).** Hit `origin`:
+   `acquired` = matches RULES (an allowlist of acquired genes) → the ONLY source of FAIL.
+   `intrinsic` = efflux / permeability / regulator / target-alteration mechanism, or chromosomal names (EC-*, ampC,
+   acr*, mdt*, emr*, mar*, sox*, rob, etc.) → `used_for_calls:false`, rule "intrinsic", UI "Intrinsic — informational". INTRINSIC is checked before RULES.
+   `unclassified` = other inactivation enzymes, strict/exact tier → at most UNCERTAIN for its CARD drug class, never FAIL.
+   **Acceptance: eco_k12 produces zero FAIL calls.**
 3. **Allele caution**: a SHV/TEM allele name is trusted only when tier=exact; otherwise ESBL-dependent drugs → UNCERTAIN.
 4. **Combine** per antibiotic: FAIL from exact/strict wins; partial-tier FAIL → UNCERTAIN; else NO_KNOWN.
    Confidence: FAIL high (exact) / medium (strict); NO_KNOWN medium (good QC) / low (fair).
