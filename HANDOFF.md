@@ -29,3 +29,5 @@
   backend/.venv/bin/python backend/pipeline_spike.py data/samples/ecoli_k12.fasta > data/spike/ecoli_k12.hits.tsv 2> data/spike/ecoli_k12.run.log
   ```
 - Sources: CARD automatic downloads `https://card.mcmaster.ca/latest/data`; KPNIH1 project `https://www.ncbi.nlm.nih.gov/bioproject/PRJNA73191`; EC958 reference paper `https://pmc.ncbi.nlm.nih.gov/articles/PMC4134206/`. Next: lead can plan around verified target markers and ~40s real pipeline runs; cached results remain local under ignored data/.
+
+T01 done: persistent atomic JSON job API, one daemon queue worker, fake four-step result, sample list and CORS; TestClient roundtrip passes in 8.38s (1 test).

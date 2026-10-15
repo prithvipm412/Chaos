@@ -7,7 +7,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
 ## FIX — lead puts urgent fixes here (do these first)
 
 ## M0 — Skeleton end to end with fake data (target 14:00)
-- [ ] T01 [CORE] Job API skeleton with a fake runner
+- [x] T01 [CORE] Job API skeleton with a fake runner
   Files: backend/main.py, backend/jobs.py, backend/config.py, backend/requirements.txt
   Do: Add python-multipart, httpx, pytest, pyrodigal, biopython to requirements.txt and install them in backend/.venv.
   config.py: DATA_DIR (env DATA_DIR, default <repo>/data), CARD_DIR, SAMPLES_DIR, JOBS_DIR, CACHE_DIR,
