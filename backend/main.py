@@ -1,12 +1,12 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, File, Form, UploadFile
+from fastapi import FastAPI, File, Form, UploadFile, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from backend.config import MAX_UPLOAD_BYTES
 
-from backend.jobs import create_job, get_job, retry_job, startup
+from backend.jobs import create_job, get_job, retry_job, startup, list_jobs
 from backend.samples import available_samples
 from backend.qc import InputError, parse_and_qc
 
@@ -85,3 +85,8 @@ def retry(job_id: str):
     if result is None:
         return error_response('JOB_NOT_FOUND', 'This analysis no longer exists.', 'Start a new analysis.', 404)
     return {'job_id': result, 'status': 'queued'}
+
+
+@app.get('/api/jobs')
+def recent_jobs(limit: int = Query(10, ge=1, le=100)):
+    return list_jobs(limit)

@@ -35,6 +35,15 @@ def get_job(job_id):
             return None
 
 
+def list_jobs(limit=10):
+    rows = []
+    for path in JOBS_DIR.glob('*/job.json'):
+        job = get_job(path.parent.name)
+        if job and all(isinstance(job.get(k), str) for k in ('job_id', 'status', 'created_at', 'label')):
+            rows.append({k: job[k] for k in ('job_id', 'status', 'created_at', 'label')})
+    return sorted(rows, key=lambda row: row['created_at'], reverse=True)[:limit]
+
+
 def startup():
     """Interrupted jobs are retryable; never silently restart an analysis after a crash."""
     if not JOBS_DIR.exists():
