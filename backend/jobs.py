@@ -46,27 +46,78 @@ def create_job(fasta_bytes: bytes | None, sample_id: str | None, label: str, sim
     return job_id
 
 
+def annotate_hits(alignments, orfs):
+    from backend.card import load_card_index
+    from backend.config import CARD_DIR
+    index = load_card_index(CARD_DIR)
+    positions = {orf['orf_id']: orf for orf in orfs}
+    hits = []
+    for alignment in alignments:
+        annotation = index.get(alignment['aro'])
+        if not annotation:
+            raise ValueError('CARD annotation missing for ' + alignment['aro'])
+        orf = positions[alignment['orf_id']]
+        identity, coverage = alignment['identity'], alignment['coverage']
+        tier = 'exact' if identity >= 98 and coverage >= 90 else 'strict' if identity >= 80 and coverage >= 80 else 'partial'
+        hits.append(dict(alignment, hit_id=f'h{len(hits)+1}', gene=annotation['name'], family=annotation['family'],
+                         drug_classes=annotation['drug_classes'], mechanism=annotation['mechanism'], tier=tier,
+                         contig=orf['contig'], start=orf['start'], end=orf['end'], strand=orf['strand'],
+                         used_for_calls=True, rule='class_match'))
+    return hits
+
+
+def execute_pipeline(data, update=None, simulate=None):
+    from backend.qc import parse_and_qc
+    from backend.genes import call_genes
+    from backend.blast import run_blastp
+    from backend.config import BLAST_DB, BLAST_TIMEOUT_S, BLAST_THREADS
+    from backend.predict import predict
+
+    def step(index, action, detail):
+        if update:
+            update(index, 'running', 0, '')
+        started = time.monotonic()
+        value = action()
+        if update:
+            update(index, 'done', time.monotonic() - started, detail(value))
+        return value
+
+    contigs, qc = step(0, lambda: parse_and_qc(data), lambda value: f"{value[1]['n_contigs']} contigs, {value[1]['total_length']/1e6:.2f} Mb")
+    try:
+        orfs = step(1, lambda: call_genes(contigs), lambda value: f'{len(value):,} genes')
+    except Exception as exc:
+        from backend.blast import BlastError
+        raise BlastError('GENE_CALLING_FAILED', 'Gene calling failed. Please check the genome and retry.') from exc
+    alignments = step(2, lambda: run_blastp(orfs, BLAST_DB, BLAST_TIMEOUT_S, BLAST_THREADS), lambda value: f'{len(value):,} alignments')
+    hits = annotate_hits(alignments, orfs)
+    prediction = step(3, lambda: predict(hits, qc), lambda value: f"{len(value['calls'])} antibiotics")
+    selected = {name for name, seq in sorted(contigs, key=lambda c: len(c[1]), reverse=True)[:30]}
+    selected.update(h['contig'] for h in hits)
+    return dict(qc=qc, genes_called=len(orfs), contigs=[dict(id=name, length=len(seq)) for name, seq in contigs if name in selected],
+                hits=hits, **prediction)
+
+
 def run_job(job):
+    from backend.blast import BlastError
     job['status'] = 'running'
-    for index, step in enumerate(job['steps']):
-        step['status'] = 'running'
+    save_job(job)
+
+    def update(index, status, elapsed, detail):
+        job['steps'][index].update(status=status, elapsed_s=round(elapsed, 3), detail=detail)
+        job['progress'] = sum(s['status'] == 'done' for s in job['steps']) / 4
         save_job(job)
-        time.sleep(2)
-        step.update(status='done', elapsed_s=2.0, detail='Demo data')
-        job['progress'] = (index + 1) / 4
-        save_job(job)
-    hit = dict(hit_id='h1', gene='KPC-3', aro='ARO:3002312', family='KPC beta-lactamase', drug_classes=['carbapenem'],
-               mechanism='antibiotic inactivation', identity=100.0, coverage=100.0, tier='exact', contig='CP008830.1',
-               start=15984, end=16865, strand='+', used_for_calls=True, rule='carbapenemase')
-    calls = [dict(antibiotic=name, group='Carbapenems' if name != 'Ceftriaxone' else 'Cephalosporins', status='FAIL',
-                  confidence='high', evidence=['h1'], reason='KPC-3 carbapenemase (100% id, 100% cov)')
-             for name in ['Meropenem', 'Imipenem', 'Ceftriaxone']]
-    job['result'] = dict(qc=dict(total_length=5766615, n_contigs=4, n50=5394056, longest_contig=5394056,
-                                  gc_percent=57.2, n_percent=0.01, grade='good', warnings=[]), genes_called=5547,
-                         contigs=[dict(id='CP008830.1', length=113105)], hits=[hit], calls=calls,
-                         summary=dict(fail=3, uncertain=0, no_known=0, headline='Carbapenem-resistant (KPC-3)', options=[]),
-                         disclaimer=DISCLAIMER)
-    job.update(status='done', progress=1.0)
+
+    try:
+        data = (JOBS_DIR / job['job_id'] / 'input.fasta').read_bytes()
+        job['result'] = execute_pipeline(data, update, job.get('simulate'))
+        job.update(status='done', progress=1.0)
+    except Exception as exc:
+        code = exc.code if isinstance(exc, BlastError) else 'INTERNAL'
+        message = exc.message if isinstance(exc, BlastError) else 'Analysis failed. Please retry.'
+        job.update(status='failed', error=dict(code=code, message=message, retryable=True))
+        for step in job['steps']:
+            if step['status'] == 'running':
+                step['status'] = 'failed'
     save_job(job)
 
 
