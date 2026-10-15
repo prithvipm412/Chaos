@@ -16,3 +16,12 @@ def test_rules(gene,name):
 def test_panel():
     assert len(PANEL) == 16
     assert len({p['antibiotic'] for p in PANEL}) == 16
+
+
+def test_classification_origin_and_priority():
+    from backend.rules import classify
+    assert classify('oqxA', '', 'antibiotic efflux') == ('intrinsic', None)
+    assert classify('unknown', '', 'antibiotic target alteration') == ('intrinsic', None)
+    assert classify('mcr-1', '', 'antibiotic target alteration')[0] == 'acquired'
+    assert classify('armA', '', 'antibiotic target alteration')[0] == 'acquired'
+    assert classify('unknown', '', 'antibiotic inactivation') == ('unclassified', None)

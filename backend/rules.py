@@ -44,17 +44,22 @@ RULES = [
 # Mechanism/family plus known chromosomal regulatory/target genes, not acquired-marker evidence.
 INTRINSIC = re.compile(r'efflux|permeability|regulat|\bEC-\d+\b|\bampC\b|'
     r'\b(?:acr[A-Z]|mdt[A-Z]|emr[A-Z]|mar[A-Z]|gad[WX]|leuO|rosB|kdpE|msbA|omp[A-Z]\w*|'
-    r'cpxA|h-ns|evg[AS]|pmr[EF]|ept[AB]|arnT|ugd|bacA|crp|rsmA|tolC|yojI)\b', re.I)
+    r'cpxA|h-ns|evg[AS]|pmr[EF]|ept[AB]|arnT|ugd|bacA|crp|rsmA|tolC|yojI|sox[A-Z]|rob)\b', re.I)
+
+
+def classify(gene, family, mechanism):
+    # Intrinsic names/efflux/permeability/regulators take priority over acquired-marker matches.
+    if INTRINSIC.search(' '.join([gene, family, mechanism])):
+        return 'intrinsic', None
+    for rule in RULES:
+        if rule['match'].search(gene) or rule['match'].search(family):
+            return 'acquired', rule
+    # Named acquired target-altering markers (mcr/armA/rmt) are explicit exceptions above.
+    if re.search(r'target alteration', mechanism, re.I):
+        return 'intrinsic', None
+    return 'unclassified', None
 
 
 def match_rule(gene, family, mechanism):
-    # Named acquired-marker rules take priority over broad mechanism labels (e.g. oqxAB).
-    for rule in RULES:
-        if rule['match'].search(gene):
-            return rule
-    if INTRINSIC.search(' '.join([gene, family, mechanism])):
-        return 'intrinsic'
-    for rule in RULES:
-        if rule['match'].search(family):
-            return rule
-    return None
+    origin, rule = classify(gene, family, mechanism)
+    return 'intrinsic' if origin == 'intrinsic' else rule
