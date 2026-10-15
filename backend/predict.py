@@ -1,6 +1,6 @@
 """Conservative marker rules: homolog presence alone never proves susceptibility."""
 import re
-from backend.rules import PANEL, match_rule
+from backend.rules import PANEL, classify
 
 DISCLAIMER = 'Decision support only — confirm with lab AST. Absence of known genes does not prove susceptibility.'
 
@@ -9,14 +9,15 @@ def predict(hits: list[dict], qc: dict) -> dict:
     effects = {drug['antibiotic']: [] for drug in PANEL}
     pairs = {'sulfonamide': [], 'trimethoprim': []}
     for hit in hits:
-        rule = match_rule(hit['gene'], hit.get('family', ''), hit.get('mechanism', ''))
+        origin, rule = classify(hit['gene'], hit.get('family', ''), hit.get('mechanism', ''))
+        hit['origin'] = origin
         hit['used_for_calls'] = False
-        if rule == 'intrinsic':
+        if origin == 'intrinsic':
             hit['rule'] = 'intrinsic'
             continue
         if rule is None:
             hit['rule'] = 'unmatched'
-            if 'inactivation' not in hit.get('mechanism', '').lower():
+            if hit['tier'] == 'partial' or 'inactivation' not in hit.get('mechanism', '').lower():
                 continue
             uncertain = [d['antibiotic'] for d in PANEL if set(d['classes']) & set(hit.get('drug_classes', []))]
             fail = []

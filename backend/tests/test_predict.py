@@ -72,3 +72,25 @@ def test_best_per_orf():
     alignments=[dict(orf_id='o1',aro=aro,ref_name='KPC-3',identity=i,coverage=100,bitscore=i) for i in (80,100)]
     result=annotate_hits(alignments,[dict(orf_id='o1',contig='c1',start=1,end=900,strand='+')])
     assert len(result)==1 and result[0]['tier']=='exact'
+
+
+def test_origin_contract_and_real_k12():
+    import csv
+    from pathlib import Path
+    import pytest
+    from backend.card import load_card_index
+    from backend.config import CARD_DIR
+    path=Path('data/spike/ecoli_k12.hits.tsv')
+    if not path.exists():
+        pytest.skip('Run setup spike first for real K-12 evidence')
+    index=load_card_index(CARD_DIR)
+    hits=[]
+    for row in csv.DictReader(path.open(),delimiter='\t'):
+        annotation=index[row['aro']]
+        hits.append(dict(hit_id='h'+str(len(hits)),gene=row['gene'],family=annotation['family'],
+                         mechanism=annotation['mechanism'],drug_classes=annotation['drug_classes'],
+                         identity=float(row['identity_pct']),coverage=float(row['coverage_pct']),tier=row['tier']))
+    result=predict(hits, {'grade':'good'})
+    assert result['summary']['fail']==0
+    assert all(h['origin'] in ('acquired','intrinsic','unclassified') for h in hits)
+    assert all(not h['used_for_calls'] for h in hits if h['origin']=='intrinsic')
