@@ -218,7 +218,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Depends on: T04
   Done when: stopping the backend mid-run shows the banner, and restarting it resumes to done (or to INTERRUPTED with Retry).
 
-- [ ] T22 [CORE] Result cache + precompute samples
+- [x] T22 [CORE] Result cache + precompute samples
   Files: backend/jobs.py, scripts/precompute.py
   Do: Cache key = sha256(fasta bytes) + RULES_VERSION (a constant in jobs.py). On a hit, the job still walks the 4 steps quickly
   (0.3 s each, details from the cache), with `cached:true`. precompute.py runs every sample through the same functions and fills
