@@ -40,7 +40,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Done when: a test on a NO_KNOWN-heavy fixture (e.g. eco_k12-shaped) asserts `options[0]` is never Nitrofurantoin
   or Fosfomycin when any non-urinary NO_KNOWN option exists, and that both calls carry `tags: ['urinary_tract_only']`.
 
-- [ ] F6 [UI] Status badges overflow; show urinary tag; set tab title
+- [ ] F6 [CORE] Status badges overflow; show urinary tag; set tab title
   Files: frontend/src/components/AntibiogramGrid.jsx, frontend/src/components/SummaryBar.jsx, frontend/index.html
   Do: Bug (user testing, seen on K-12) — status badges overflow their card and overlap the drug name. Shorten the
   3 labels to "Likely to fail" / "Uncertain" / "No known" (drop "resistance found" from the NO_KNOWN label) and make
