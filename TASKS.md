@@ -107,7 +107,7 @@ UI pushes with `git pull --rebase origin main && git push origin HEAD:main`.
   Depends on: T07
   Done when: test with a fake KPC-3 hit gives Meropenem FAIL; an empty hit list with poor QC gives no NO_KNOWN at all.
 
-- [ ] T10 [CORE] Wire the real pipeline into the worker + sample registry
+- [x] T10 [CORE] Wire the real pipeline into the worker + sample registry
   Files: backend/jobs.py, backend/samples.py, backend/main.py
   Do: samples.py: `SAMPLES = [{id, label, organism, note, path}]` for the 4 ids (paths: kpn_kpc→data/samples/kp_kpc.fasta,
   eco_ctxm→ecoli_ctxm.fasta, eco_k12→ecoli_k12.fasta; kpn_kpc_partial→kpn_kpc_partial.fasta from T23. List only files that exist). /api/samples returns them without the path.
